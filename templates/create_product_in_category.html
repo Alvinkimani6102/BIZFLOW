@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Product | {{ category.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a href="/dashboard" class="brand">
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW Logo"
+        >
+    </a>
+
+    <nav>
+
+        <a href="{{ url_for('products',
+                            business_id=business._id) }}">
+            Products
+        </a>
+
+        <a href="{{ url_for('business_workspace',
+                            business_id=business._id) }}">
+            Business
+        </a>
+
+        <a href="/logout" class="signup-button">
+            Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="products-page">
+
+    <div class="products-container">
+
+        <p class="workspace-label">
+            {{ business.name }}
+        </p>
+
+        <h1>Create Product</h1>
+
+        <p>
+            Category: <strong>{{ category.name }}</strong>
+        </p>
+
+        <hr>
+
+        <form method="POST" class="create-product-form">
+
+    <label for="product_name">
+        Product Name
+    </label>
+
+    <input
+        type="text"
+        id="product_name"
+        name="product_name"
+        placeholder="e.g. Green Shorts"
+        required
+    >
+
+
+    <label for="sku">
+        Product ID / SKU
+    </label>
+
+    <input
+        type="text"
+        id="sku"
+        name="sku"
+        placeholder="e.g. SHORT-GREEN-001"
+        required
+    >
+
+
+    <label for="description">
+        Description
+    </label>
+
+    <textarea
+        id="description"
+        name="description"
+        rows="5"
+        placeholder="Describe this product..."
+    ></textarea>
+
+
+    <label for="measurement_type">
+        Measurement Type
+    </label>
+
+    <select
+        id="measurement_type"
+        name="measurement_type"
+        required
+    >
+
+        
+        <option value="Piece">Piece</option>
+        <option value="Kilogram">Kilogram</option>
+        <option value="Gram">Gram</option>
+        <option value="Litre">Litre</option>
+        <option value="Millilitre">Millilitre</option>
+        <option value="KEG">KEG</option>
+        <option value="MALA">MALA</option>
+
+
+    </select>
+
+
+    <label for="opening_quantity">
+        Opening Quantity
+    </label>
+
+    <input
+        type="number"
+        id="opening_quantity"
+        name="opening_quantity"
+        min="0"
+        step="0.01"
+        placeholder="e.g. 50"
+        required
+    >
+
+
+    <label for="low_stock_threshold">
+        Low Stock Threshold
+    </label>
+
+    <input
+        type="number"
+        id="low_stock_threshold"
+        name="low_stock_threshold"
+        min="0"
+        step="0.01"
+        placeholder="e.g. 5"
+        required
+    >
+
+
+    <label for="buying_price">
+    Buying / Cost Price Per Unit
+</label>
+
+    <input
+        type="number"
+        id="buying_price"
+        name="buying_price"
+        min="0"
+        step="0.01"
+        placeholder="e.g. 500"
+        required
+    >
+
+
+    <label for="selling_price">
+    Selling Price Per Unit
+</label>
+
+    <input
+        type="number"
+        id="selling_price"
+        name="selling_price"
+        min="0"
+        step="0.01"
+        placeholder="e.g. 800"
+        required
+    >
+
+    
+    <!-- MULTIPLE SELLING SIZES -->
+
+    <div class="form-group">
+
+        <label for="has_selling_sizes">
+            Selling Options
+        </label>
+
+        <select
+            id="has_selling_sizes"
+            name="has_selling_sizes"
+        >
+            <option value="no">One selling price</option>
+            <option value="yes">Multiple sizes or serving prices</option>
+        </select>
+
+    </div>
+
+    <div id="selling-sizes-section" style="display: none;">
+
+        <div class="form-group">
+            <label for="large_cups_per_keg">Large cups per keg</label>
+            <input
+                type="number"
+                id="large_cups_per_keg"
+                name="large_cups_per_keg"
+                min="1"
+                step="1"
+                value="50"
+                disabled
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="small_cups_per_keg">Small cups per keg</label>
+            <input
+                type="number"
+                id="small_cups_per_keg"
+                name="small_cups_per_keg"
+                min="1"
+                step="1"
+                value="100"
+                disabled
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="large_cup_price">Large Cup Price (KSh)</label>
+            <input
+                type="number"
+                id="large_cup_price"
+                name="large_cup_price"
+                min="0.01"
+                step="0.01"
+                placeholder="80.00"
+                disabled
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="small_cup_price">Small Cup Price (KSh)</label>
+            <input
+                type="number"
+                id="small_cup_price"
+                name="small_cup_price"
+                min="0.01"
+                step="0.01"
+                placeholder="50.00"
+                disabled
+            >
+        </div>
+
+    </div>
+
+
+    <div class="product-calculations">
+
+    <h3>Product Value Summary</h3>
+
+    <p>
+        Total Buying Value:
+        <strong id="totalBuyingValue">KSh 0.00</strong>
+    </p>
+
+    <p>
+        Total Selling Value:
+        <strong id="totalSellingValue">KSh 0.00</strong>
+    </p>
+
+    <p>
+        Expected Profit:
+        <strong id="expectedProfit">KSh 0.00</strong>
+    </p>
+
+</div>
+
+
+    <br><br>
+
+    <button type="submit">
+        Create Product
+    </button>
+
+</form>
+
+        <br>
+
+        <a href="{{ url_for('category_workspace',
+                            business_id=business._id,
+                            category_id=category._id) }}">
+            ← Back to Category
+        </a>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW"
+        class="footer-logo"
+    >
+
+    <p>
+        © 2026 BIZFLOW. All rights reserved.
+    </p>
+
+    <p class="footer-tagline">
+        Manage • Track • Grow
+    </p>
+
+</footer>
+
+<script>
+
+function calculateProductValues() {
+
+    const quantity = parseFloat(
+        document.getElementById("opening_quantity").value
+    ) || 0;
+
+    const buyingPrice = parseFloat(
+        document.getElementById("buying_price").value
+    ) || 0;
+
+    const sellingPrice = parseFloat(
+        document.getElementById("selling_price").value
+    ) || 0;
+
+    const totalBuying = quantity * buyingPrice;
+    const totalSelling = quantity * sellingPrice;
+    const profit = totalSelling - totalBuying;
+
+    document.getElementById("totalBuyingValue").textContent =
+        "KSh " + totalBuying.toFixed(2);
+
+    document.getElementById("totalSellingValue").textContent =
+        "KSh " + totalSelling.toFixed(2);
+
+    document.getElementById("expectedProfit").textContent =
+        "KSh " + profit.toFixed(2);
+}
+
+
+document.getElementById("opening_quantity").addEventListener(
+    "input",
+    calculateProductValues
+);
+
+document.getElementById("buying_price").addEventListener(
+    "input",
+    calculateProductValues
+);
+
+document.getElementById("selling_price").addEventListener(
+    "input",
+    calculateProductValues
+);
+
+calculateProductValues();
+
+
+
+const sellingOptions = document.getElementById("has_selling_sizes");
+const measurementType = document.getElementById("measurement_type");
+const sizesSection = document.getElementById("selling-sizes-section");
+
+const sizeInputs = sizesSection.querySelectorAll("input");
+
+function toggleSellingSizes() {
+    const isContainerProduct = ["KEG", "MALA"].includes(
+        measurementType.value
+    );
+
+    const enabled =
+        isContainerProduct && sellingOptions.value === "yes";
+
+    sizesSection.style.display = enabled ? "block" : "none";
+
+    sizeInputs.forEach(function (input) {
+        input.disabled = !enabled;
+        input.required = enabled;
+    });
+
+    // Show the selling-options selector only for KEG and MALA.
+    sellingOptions.closest(".form-group").style.display =
+        isContainerProduct ? "block" : "none";
+
+    // Reset to one selling price for ordinary products.
+    if (!isContainerProduct) {
+        sellingOptions.value = "no";
+    }
+}
+
+sellingOptions.addEventListener("change", toggleSellingSizes);
+measurementType.addEventListener("change", toggleSellingSizes);
+
+toggleSellingSizes();
+
+
+
+</script>
+
+</body>
+
+</html>

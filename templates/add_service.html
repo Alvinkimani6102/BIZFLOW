@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Add Service | {{ business.name }} | BIZFLOW
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static',
+                           filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a href="/dashboard" class="brand">
+
+        <img
+            src="{{ url_for('static',
+                            filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW Logo"
+        >
+
+    </a>
+
+    <nav>
+
+        <a href="{{ url_for('services',
+                            business_id=business._id) }}">
+            Services
+        </a>
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/logout"
+           class="signup-button">
+            Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="signup-page">
+
+    <div class="signup-container">
+
+        <p class="workspace-label">
+            {{ business.name }}
+        </p>
+
+        <h1>
+            Add Service
+        </h1>
+
+        <p class="signup-description">
+            Add a service that your business
+            provides to customers.
+        </p>
+
+
+        <form
+            action="{{ url_for('add_service',
+                               business_id=business._id) }}"
+            method="POST"
+        >
+
+            <!-- SERVICE NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Service Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Website Development"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <input
+                    type="text"
+                    id="category"
+                    name="category"
+                    placeholder="e.g. IT Services"
+                    required
+                >
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    placeholder="Describe the service you provide"
+                ></textarea>
+
+            </div>
+
+
+            <!-- COST -->
+
+            <div class="form-group">
+
+                <label for="cost">
+                    Service Cost
+                </label>
+
+                <input
+                    type="number"
+                    id="cost"
+                    name="cost"
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+                <small class="form-help">
+                    Your estimated cost of providing this service.
+                </small>
+
+            </div>
+
+
+            <!-- SELLING PRICE -->
+
+            <div class="form-group">
+
+                <label for="selling_price">
+                    Customer Price
+                </label>
+
+                <input
+                    type="number"
+                    id="selling_price"
+                    name="selling_price"
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+                <small class="form-help">
+                    The amount you charge the customer.
+                </small>
+
+            </div>
+
+
+            <!-- DURATION -->
+
+            <div class="form-group">
+
+                <label for="duration">
+                    Service Duration
+                </label>
+
+                <input
+                    type="text"
+                    id="duration"
+                    name="duration"
+                    placeholder="e.g. 2 hours, 3 days, 1 week"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AVAILABILITY -->
+
+            <div class="service-availability">
+
+                <label class="availability-label">
+
+                    <input
+                        type="checkbox"
+                        name="available"
+                        checked
+                    >
+
+                    <span>
+                        Service is currently available
+                    </span>
+
+                </label>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="signup-submit"
+            >
+                Add Service
+            </button>
+
+        </form>
+
+
+        <p class="login-text">
+
+            <a href="{{ url_for('services',
+                                business_id=business._id) }}">
+
+                ← Back to Services
+
+            </a>
+
+        </p>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <img
+        src="{{ url_for('static',
+                        filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW"
+        class="footer-logo"
+    >
+
+    <p>
+        © 2026 BIZFLOW. All rights reserved.
+    </p>
+
+    <p class="footer-tagline">
+        Manage • Track • Grow
+    </p>
+
+</footer>
+
+</body>
+
+</html>

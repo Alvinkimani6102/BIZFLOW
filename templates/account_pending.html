@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Account Pending Approval | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .approval-container {
+            max-width: 520px;
+            margin: 80px auto;
+            padding: 35px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .approval-icon {
+            width: 75px;
+            height: 75px;
+            margin: 0 auto 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 35px;
+        }
+
+        .approval-container h1 {
+            color: #172554;
+            margin-bottom: 15px;
+        }
+
+        .approval-container p {
+            color: #64748b;
+            line-height: 1.8;
+        }
+
+        .approval-status {
+            margin: 25px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fffbeb;
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .approval-button {
+            display: inline-block;
+            padding: 13px 24px;
+            margin-top: 12px;
+            border-radius: 8px;
+            background: #2563eb;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .approval-button:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 600px) {
+            .approval-container {
+                margin: 30px 16px;
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="approval-container">
+
+    <div class="approval-icon">🔐</div>
+
+    <h1>Welcome to BIZFLOW!</h1>
+
+    <p>
+        Your account registration has been received successfully.
+    </p>
+
+    <div class="approval-status">
+        Account Status: Awaiting Approval
+    </div>
+
+    <p>
+        Please contact the BIZFLOW administrator and wait for your
+        account creation to be approved.
+    </p>
+
+    <p>
+        You will be able to access your account after the administrator
+        approves your registration.
+    </p>
+
+    <a href="{{ url_for('login') }}" class="approval-button">
+        Return to Login
+    </a>
+
+</div>
+
+</body>
+</html>

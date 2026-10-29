@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Business Expenses | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .admin-expenses-container {
+            max-width: 1400px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .admin-expenses-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .admin-expenses-header h1 {
+            margin: 0 0 8px;
+            color: #0f172a;
+        }
+
+        .admin-expenses-header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .admin-expenses-button {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #1d4ed8;
+            color: white;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .admin-expenses-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .admin-expenses-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .admin-expenses-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .admin-expenses-table th,
+        .admin-expenses-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .admin-expenses-table th {
+            background: #f8fafc;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        .admin-expenses-table td {
+            color: #334155;
+        }
+
+        .admin-expenses-count {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 6px 10px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .admin-expenses-empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .admin-expenses-container {
+                margin: 15px auto;
+                padding: 12px;
+            }
+
+            .admin-expenses-card {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="brand">
+        <a href="{{ url_for('admin_panel') }}"
+           style="text-decoration:none;color:inherit;">
+            BIZFLOW
+        </a>
+    </div>
+</header>
+
+<main class="admin-expenses-container">
+
+    <div class="admin-expenses-header">
+        <div>
+            <h1>Business Expenses</h1>
+            <p>Business: <strong>{{ business.name }}</strong></p>
+            <p style="margin-top:6px;">
+                Administrator view — records are read-only.
+            </p>
+        </div>
+
+        <a class="admin-expenses-button"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+    </div>
+
+    <section class="admin-expenses-card">
+
+        <span class="admin-expenses-count">
+            Expenses found: {{ expenses_list|length }}
+        </span>
+
+        {% if expenses_list %}
+
+        <div class="admin-expenses-table-wrapper">
+            <table class="admin-expenses-table">
+                <thead>
+                    <tr>
+                        <th>Expense</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Payment Method</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for expense in expenses_list %}
+                    <tr>
+                        <td>
+                            <strong>
+                                {{ expense.get('title', expense.get('name', expense.get('expense_name', 'Expense'))) }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ expense.get('category', '—') or '—' }}
+                        </td>
+
+                        <td>
+                            {% set amount = expense.get('amount', expense.get('total', 0)) %}
+                            KSh {{ "%.2f"|format(amount|float) }}
+                        </td>
+
+                        <td>
+                            {{ expense.get('payment_method', '—') or '—' }}
+                        </td>
+
+                        <td>
+                            {% set expense_date = expense.get('date', expense.get('created_at')) %}
+                            {% if expense_date %}
+                                {% if expense_date.strftime is defined %}
+                                    {{ expense_date.strftime('%d %b %Y') }}
+                                {% else %}
+                                    {{ expense_date }}
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ expense.get('description', '—') or '—' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+
+        <div class="admin-expenses-empty">
+            <h3>No expenses found</h3>
+            <p>This business does not have any matching expense records yet.</p>
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+</body>
+</html>

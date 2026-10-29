@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Account Deactivated | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #eff6ff, #f8fafc, #eef2ff);
+            font-family: Arial, Helvetica, sans-serif;
+            color: #172033;
+        }
+
+        .deactivated-wrapper {
+            width: 100%;
+            max-width: 490px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .brand-name {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #1d4ed8;
+        }
+
+        .brand-name span {
+            color: #0f172a;
+        }
+
+        .brand-tagline {
+            margin-top: 7px;
+            color: #64748b;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .message-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 38px 30px;
+            text-align: center;
+            box-shadow: 0 20px 55px rgba(15, 23, 42, 0.09);
+        }
+
+        .warning-icon {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 50%;
+            color: #dc2626;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .message-card h1 {
+            margin: 0 0 14px;
+            font-size: 25px;
+            line-height: 1.3;
+            color: #0f172a;
+        }
+
+        .message-card .intro {
+            margin: 0 0 20px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #64748b;
+        }
+
+        .notice {
+            margin: 22px 0;
+            padding: 15px;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            background: #fff7f7;
+            color: #991b1b;
+            font-size: 14px;
+            line-height: 1.7;
+            text-align: left;
+        }
+
+        .support-text {
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #64748b;
+        }
+
+        .login-button {
+            display: block;
+            width: 100%;
+            padding: 14px 18px;
+            margin-top: 25px;
+            background: #1d4ed8;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .login-button:hover {
+            background: #1e40af;
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 22px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .message-card {
+                padding: 30px 21px;
+            }
+
+            .message-card h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="deactivated-wrapper">
+
+    <div class="brand">
+        <div class="brand-name">BIZ<span>FLOW</span></div>
+        <div class="brand-tagline">Business Management Platform</div>
+    </div>
+
+    <main class="message-card">
+
+        <div class="warning-icon" aria-hidden="true">!</div>
+
+        <h1>Your Account Is Deactivated</h1>
+
+        <p class="intro">
+            Your BIZFLOW account is currently inactive, so you cannot
+            access your business workspace at this time.
+        </p>
+
+        <div class="notice">
+            <strong>Access temporarily unavailable</strong><br>
+            Your account has been deactivated by the system administrator.
+            If you believe this was a mistake, please contact the BIZFLOW
+            administrator for assistance.
+        </div>
+
+        <p class="support-text">
+            Your business information has not been deleted because of this
+            status change. Access can be restored when your account is
+            reactivated by the administrator.
+        </p>
+
+        <a href="{{ url_for('login') }}" class="login-button">
+            Return to Login
+        </a>
+
+    </main>
+
+    <div class="footer">
+        &copy; {{ now_year if now_year is defined else 2026 }} BIZFLOW.
+        All rights reserved.
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Business Categories | BIZFLOW Admin</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .admin-categories {
+            max-width: 1150px;
+            margin: 40px auto;
+            padding: 24px;
+        }
+
+        .categories-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .categories-header h1 {
+            margin: 0 0 8px;
+            color: #172554;
+        }
+
+        .categories-header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .categories-summary {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 22px;
+        }
+
+        .categories-summary strong {
+            display: block;
+            font-size: 28px;
+            color: #1d4ed8;
+        }
+
+        .categories-table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .categories-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        .categories-table th,
+        .categories-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .categories-table th {
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .categories-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .category-description {
+            color: #64748b;
+        }
+
+        .empty-categories {
+            padding: 35px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #1d4ed8;
+            color: white;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            background: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .admin-categories {
+                margin: 20px auto;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="admin-categories">
+
+    <div class="categories-header">
+        <div>
+            <h1>Business Categories</h1>
+            <p>
+                Business:
+                <strong>{{ business.name }}</strong>
+            </p>
+        </div>
+
+        <a class="back-link"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+    </div>
+
+    <section class="categories-summary">
+        <span>Total Categories</span>
+        <strong>{{ categories_list|length }}</strong>
+    </section>
+
+    <div class="categories-table-wrapper">
+
+        {% if categories_list %}
+
+        <table class="categories-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Category Name</th>
+                    <th>Description</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for category in categories_list %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+
+                    <td class="category-name">
+                        {{ category.get('name', 'Unnamed Category') }}
+                    </td>
+
+                    <td class="category-description">
+                        {{ category.get('description', '—') or '—' }}
+                    </td>
+
+                    <td>
+                        {% if category.get('created_at') %}
+                            {{ category.get('created_at') }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+
+        <div class="empty-categories">
+            <h3>No categories found</h3>
+            <p>This business has no categories recorded yet.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</main>
+
+</body>
+</html>

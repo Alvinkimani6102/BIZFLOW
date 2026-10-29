@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Business | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+
+        <a href="/dashboard" class="brand">
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW Logo"
+            >
+        </a>
+
+        <nav>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout" class="signup-button">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <!-- CREATE BUSINESS -->
+    <main class="signup-page">
+
+        <div class="signup-container">
+
+            <h1>Create Your Business</h1>
+
+            <p class="signup-description">
+                Add a business to your BIZFLOW account.
+            </p>
+
+
+            <form action="/create-business" method="POST">
+
+                <!-- BUSINESS NAME -->
+                <div class="form-group">
+
+                    <label for="business_name">
+                        Business Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="business_name"
+                        name="business_name"
+                        placeholder="Enter your business name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- BUSINESS TYPE -->
+                <div class="form-group">
+
+                    <label for="business_type">
+                        Business Type
+                    </label>
+
+                    <select
+                        id="business_type"
+                        name="business_type"
+                        required
+                    >
+
+                        <option value="">
+                            Select business type
+                        </option>
+
+                        <option value="Retail">
+                            Retail
+                        </option>
+
+                        <option value="Wholesale">
+                            Wholesale
+                        </option>
+
+                        <option value="Services">
+                            Services
+                        </option>
+
+                        <option value="Manufacturing">
+                            Manufacturing
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+                <div class="form-group">
+
+                    <label for="description">
+                        Business Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="4"
+                        placeholder="Describe your business"
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="signup-submit"
+                >
+                    Create Business
+                </button>
+
+            </form>
+
+
+            <p class="login-text">
+                <a href="/dashboard">
+                    ← Back to Dashboard
+                </a>
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

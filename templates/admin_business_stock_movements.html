@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Stock Movements | BIZFLOW Admin</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .stock-admin {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 24px;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stock-header h1 {
+            color: #172554;
+            margin: 0 0 8px;
+        }
+
+        .stock-header p {
+            color: #64748b;
+            margin: 0;
+        }
+
+        .stock-summary {
+            background: #ecfeff;
+            border: 1px solid #a5f3fc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stock-summary strong {
+            display: block;
+            font-size: 28px;
+            color: #0e7490;
+        }
+
+        .stock-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+        }
+
+        .stock-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .stock-table th,
+        .stock-table td {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .stock-table th {
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .stock-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .movement-type {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #e0f2fe;
+            color: #075985;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .empty-stock {
+            padding: 35px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 7px;
+            background: #1d4ed8;
+            color: white;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            background: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .stock-admin {
+                margin: 20px auto;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="stock-admin">
+
+    <header class="stock-header">
+        <div>
+            <h1>Stock Movements</h1>
+            <p>
+                Business:
+                <strong>{{ business.get('name', 'Business') }}</strong>
+            </p>
+        </div>
+
+        <a class="back-link"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+    </header>
+
+    <section class="stock-summary">
+        <span>Total Recorded Movements</span>
+        <strong>{{ movements_list|length }}</strong>
+    </section>
+
+    <div class="stock-table-wrapper">
+
+        {% if movements_list %}
+
+        <table class="stock-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Movement Type</th>
+                    <th>Quantity</th>
+                    <th>Reason / Notes</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for movement in movements_list %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+
+                    <td>
+                        {{ movement.get('product_name',
+                           movement.get('name', '—')) }}
+                    </td>
+
+                    <td>
+                        <span class="movement-type">
+                            {{ movement.get('movement_type',
+                               movement.get('type', '—')) }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ movement.get('quantity',
+                           movement.get('change', '—')) }}
+                    </td>
+
+                    <td>
+                        {{ movement.get('reason',
+                           movement.get('notes', '—')) or '—' }}
+                    </td>
+
+                    <td>
+                        {{ movement.get('created_at',
+                           movement.get('date', '—')) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+
+        <div class="empty-stock">
+            <h3>No stock movements found</h3>
+            <p>This business has no matching stock movement records yet.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</main>
+
+</body>
+</html>

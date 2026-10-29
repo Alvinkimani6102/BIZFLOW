@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Product | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+
+        <a href="/dashboard" class="brand">
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW Logo"
+            >
+        </a>
+
+        <nav>
+
+            <a href="{{ url_for('products',
+                                business_id=business._id) }}">
+                Products
+            </a>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/logout" class="signup-button">
+                Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ADD PRODUCT -->
+
+    <main class="signup-page">
+
+        <div class="signup-container">
+
+            <p class="workspace-label">
+                {{ business.name }}
+            </p>
+
+            <h1>
+                Add Product
+            </h1>
+
+            <p class="signup-description">
+                Add a physical product to your business
+                inventory.
+            </p>
+
+
+            <form action="{{ url_for('add_product',
+                                     business_id=business._id) }}"
+                  method="POST">
+
+
+                <!-- PRODUCT NAME -->
+
+                <div class="form-group">
+
+                    <label for="name">
+                        Product Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="e.g. Wireless Mouse"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CATEGORY -->
+
+                <div class="form-group">
+
+                    <label for="category">
+                        Category
+                    </label>
+
+                    <input
+                        type="text"
+                        id="category"
+                        name="category"
+                        placeholder="e.g. Electronics"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Describe your product"
+                        rows="4"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- BUYING PRICE -->
+
+                <div class="form-group">
+
+                    <label for="buying_price">
+                        Buying Price
+                    </label>
+
+                    <input
+                        type="number"
+                        id="buying_price"
+                        name="buying_price"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- SELLING PRICE -->
+
+                                <!-- SELLING PRICE -->
+
+                <div class="form-group">
+
+                    <label for="selling_price">
+                        Default Selling Price
+                    </label>
+
+                    <input
+                        type="number"
+                        id="selling_price"
+                        name="selling_price"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                    <small>
+                        Used for products sold at one fixed price.
+                    </small>
+
+                </div>
+
+
+                <!-- MULTIPLE SELLING SIZES -->
+
+                <div class="form-group">
+
+                    <label for="has_selling_sizes">
+                        Selling Options
+                    </label>
+
+                    <select
+                        id="has_selling_sizes"
+                        name="has_selling_sizes"
+                    >
+                        <option value="no">
+                            One selling price
+                        </option>
+
+                        <option value="yes">
+                            Multiple sizes or serving prices
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div id="selling-sizes-section" style="display: none;">
+
+                    <div class="form-group">
+    <label for="large_cups_per_keg">
+        Large cups per keg
+    </label>
+    <input
+        type="number"
+        id="large_cups_per_keg"
+        name="large_cups_per_keg"
+        min="1"
+        step="1"
+        value="50"
+        required
+    >
+</div>
+
+<div class="form-group">
+    <label for="small_cups_per_keg">
+        Small cups per keg
+    </label>
+    <input
+        type="number"
+        id="small_cups_per_keg"
+        name="small_cups_per_keg"
+        min="1"
+        step="1"
+        value="100"
+        required
+    >
+</div>
+
+
+                    <div class="form-group">
+
+                        <label for="large_cup_price">
+                            Large Cup Price (KSh)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="large_cup_price"
+                            name="large_cup_price"
+                            min="0"
+                            step="0.01"
+                            placeholder="80.00"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="small_cup_price">
+                            Small Cup Price (KSh)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="small_cup_price"
+                            name="small_cup_price"
+                            min="0"
+                            step="0.01"
+                            placeholder="50.00"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const sellingOptions =
+            document.getElementById("has_selling_sizes");
+
+        const sizesSection =
+            document.getElementById("selling-sizes-section");
+
+        const sizeInputs = sizesSection.querySelectorAll("input");
+
+        function toggleSellingSizes() {
+            const enabled = sellingOptions.value === "yes";
+
+            sizesSection.style.display = enabled ? "block" : "none";
+
+            sizeInputs.forEach(function (input) {
+                input.required = enabled;
+                input.disabled = !enabled;
+            });
+        }
+
+        sellingOptions.addEventListener("change", toggleSellingSizes);
+
+        toggleSellingSizes();
+
+    });
+</script>
+
+
+
+                <!-- QUANTITY -->
+
+                <div class="form-group">
+
+                    <label for="quantity">
+                        Initial Quantity
+                    </label>
+
+                    <input
+                        type="number"
+                        id="quantity"
+                        name="quantity"
+                        placeholder="0"
+                        min="0"
+                        step="1"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- LOW STOCK THRESHOLD -->
+
+                <div class="form-group">
+
+                    <label for="low_stock_threshold">
+                        Low Stock Alert Level
+                    </label>
+
+                    <input
+                        type="number"
+                        id="low_stock_threshold"
+                        name="low_stock_threshold"
+                        placeholder="e.g. 5"
+                        min="0"
+                        step="1"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- BUTTON -->
+
+                <button
+                    type="submit"
+                    class="signup-submit"
+                >
+                    Add Product
+                </button>
+
+            </form>
+
+
+            <p class="login-text">
+
+                <a href="{{ url_for('products',
+                                    business_id=business._id) }}">
+                    ← Back to Products
+                </a>
+
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

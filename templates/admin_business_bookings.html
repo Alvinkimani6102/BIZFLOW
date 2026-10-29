@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Business Bookings | BIZFLOW Admin</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .admin-bookings {
+            max-width: 1250px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .booking-heading {
+            margin-bottom: 24px;
+        }
+
+        .booking-heading h1 {
+            margin-bottom: 8px;
+        }
+
+        .booking-table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .booking-table {
+            width: 100%;
+            min-width: 1100px;
+            border-collapse: collapse;
+        }
+
+        .booking-table th,
+        .booking-table td {
+            padding: 13px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        .booking-table th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .booking-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .booking-status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            font-size: 12px;
+        }
+
+        .booking-back {
+            display: inline-block;
+            margin-bottom: 18px;
+        }
+
+        .booking-empty {
+            padding: 25px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .booking-notes {
+            max-width: 220px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="admin-bookings">
+
+        <a class="booking-back"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+
+        <div class="booking-heading">
+            <h1>Bookings History</h1>
+
+            <p>
+                Business:
+                <strong>{{ business.get('name', 'Unnamed business') }}</strong>
+            </p>
+
+            <p>Showing up to 200 of the most recent bookings.</p>
+        </div>
+
+        <div class="booking-table-wrapper">
+
+            {% if bookings_list %}
+
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Contact</th>
+                        <th>Service</th>
+                        <th>Appointment Date</th>
+                        <th>Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Service Price</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
+                        <th>Payment Status</th>
+                        <th>Payment Method</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for booking in bookings_list %}
+
+                    <tr>
+                        <td>{{ booking.get('customer', 'N/A') }}</td>
+
+                        <td>{{ booking.get('contact', 'N/A') }}</td>
+
+                        <td>{{ booking.get('service', 'N/A') }}</td>
+
+                        <td>{{ booking.get('booking_date', 'N/A') }}</td>
+
+                        <td>{{ booking.get('appointment_time', 'N/A') }}</td>
+
+                        <td>{{ booking.get('duration', 'N/A') }}</td>
+
+                        <td>
+                            <span class="booking-status">
+                                {{ booking.get('status', 'Unknown') }}
+                            </span>
+                        </td>
+
+                        <td>
+                            KSh {{ "%.2f"|format(booking.get('amount', 0)|float) }}
+                        </td>
+
+                        <td>
+                            KSh {{ "%.2f"|format(booking.get('amount_paid', 0)|float) }}
+                        </td>
+
+                        <td>
+                            KSh {{ "%.2f"|format(booking.get('balance', 0)|float) }}
+                        </td>
+
+                        <td>
+                            <span class="booking-status">
+                                {{ booking.get('payment_status', 'Unknown') }}
+                            </span>
+                        </td>
+
+                        <td>{{ booking.get('payment_method', 'N/A') }}</td>
+
+                        <td>
+                            <div class="booking-notes">
+                                {{ booking.get('notes') or '—' }}
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% else %}
+
+            <div class="booking-empty">
+                No bookings were found for this business.
+            </div>
+
+            {% endif %}
+
+        </div>
+    </main>
+</body>
+</html>

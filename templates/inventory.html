@@ -1,0 +1,690 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .inventory-page {
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 22px 60px;
+            color: #172033;
+        }
+
+        .inventory-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .inventory-topbar h1 {
+            font-size: clamp(26px, 4vw, 36px);
+            margin: 5px 0 8px;
+        }
+
+        .inventory-subtitle {
+            color: #718096;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .inventory-eyebrow {
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .inventory-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .inventory-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px 16px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid #dbe3ee;
+            background: white;
+            color: #26344b;
+            cursor: pointer;
+        }
+
+        .inventory-btn-primary {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .inventory-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 26px;
+        }
+
+        .inventory-stat {
+            background: white;
+            border: 1px solid #e7ecf3;
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 5px 20px rgba(25, 42, 70, 0.035);
+            min-width: 0;
+        }
+
+        .inventory-stat-label {
+            color: #718096;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .inventory-stat-value {
+            font-size: clamp(23px, 3vw, 30px);
+            font-weight: 800;
+            margin: 13px 0 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .inventory-stat-note {
+            color: #8792a5;
+            font-size: 12px;
+        }
+
+        .inventory-stat-icon {
+            display: inline-flex;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            font-size: 20px;
+            background: #eff6ff;
+        }
+
+        .inventory-stat.warning .inventory-stat-icon {
+            background: #fff7e6;
+        }
+
+        .inventory-stat.danger .inventory-stat-icon {
+            background: #fff0f0;
+        }
+
+        .inventory-alerts {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .inventory-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            padding: 17px;
+            border-radius: 12px;
+            border: 1px solid #f2d99b;
+            background: #fffbeb;
+        }
+
+        .inventory-alert.danger {
+            background: #fff5f5;
+            border-color: #fecaca;
+        }
+
+        .inventory-alert-icon {
+            font-size: 22px;
+        }
+
+        .inventory-alert strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .inventory-alert p {
+            color: #667085;
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .inventory-panel {
+            background: white;
+            border: 1px solid #e7ecf3;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(25, 42, 70, 0.035);
+            overflow: hidden;
+        }
+
+        .inventory-panel-heading {
+            padding: 22px;
+            border-bottom: 1px solid #edf0f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .inventory-panel-heading h2 {
+            margin: 0 0 6px;
+            font-size: 20px;
+        }
+
+        .inventory-panel-heading p {
+            margin: 0;
+            color: #7b8798;
+            font-size: 13px;
+        }
+
+        .inventory-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 18px 22px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .inventory-search,
+        .inventory-select {
+            min-height: 42px;
+            border: 1px solid #dce3ed;
+            border-radius: 9px;
+            padding: 9px 12px;
+            background: white;
+            color: #26344b;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .inventory-search {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .inventory-select {
+            min-width: 155px;
+        }
+
+        .inventory-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .inventory-table th {
+            background: #f8fafc;
+            color: #718096;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: .6px;
+            padding: 15px 18px;
+            font-weight: 800;
+        }
+
+        .inventory-table td {
+            padding: 17px 18px;
+            border-top: 1px solid #edf0f5;
+            font-size: 13px;
+            color: #364256;
+        }
+
+        .inventory-table tbody tr:hover {
+            background: #fafcff;
+        }
+
+        .inventory-product-name {
+            font-weight: 750;
+            color: #172033;
+        }
+
+        .inventory-product-description {
+            font-size: 12px;
+            color: #8993a3;
+            max-width: 240px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 5px;
+        }
+
+        .inventory-status {
+            display: inline-block;
+            padding: 6px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .status-in-stock {
+            color: #167348;
+            background: #e7f8ef;
+        }
+
+        .status-low-stock {
+            color: #946200;
+            background: #fff4cf;
+        }
+
+        .status-out-of-stock {
+            color: #b42318;
+            background: #feeceb;
+        }
+
+        .inventory-empty {
+            padding: 50px 20px;
+            text-align: center;
+            color: #718096;
+        }
+
+        .inventory-empty-icon {
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        .inventory-empty h3 {
+            color: #26344b;
+            margin-bottom: 8px;
+        }
+
+        .inventory-empty p {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .inventory-table-footer {
+            padding: 16px 22px;
+            color: #718096;
+            font-size: 12px;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .inventory-back {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        @media (max-width: 900px) {
+            .inventory-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .inventory-page {
+                padding: 24px 13px 40px;
+            }
+
+            .inventory-stats {
+                gap: 10px;
+            }
+
+            .inventory-stat {
+                padding: 15px;
+            }
+
+            .inventory-alerts {
+                grid-template-columns: 1fr;
+            }
+
+            .inventory-panel-heading,
+            .inventory-filters {
+                padding: 16px;
+            }
+
+            .inventory-search,
+            .inventory-select {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .inventory-actions {
+                width: 100%;
+            }
+
+            .inventory-actions .inventory-btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+<header class="navbar">
+    <a href="{% if session.get('role') == 'worker' %}{{ url_for('business_workspace', business_id=business._id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="brand">
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW Logo"
+    >
+</a>
+
+    <nav>
+        {% if role != "worker" %}
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}" class="signup-button">Logout</a>
+    </nav>
+</header>
+
+
+<main class="inventory-page">
+
+    <div class="inventory-topbar">
+        <div>
+            <span class="inventory-eyebrow">INVENTORY MANAGEMENT</span>
+            <h1>Inventory Overview</h1>
+            <p class="inventory-subtitle">
+                {{ business.name }} — monitor physical stock and stock value.
+            </p>
+        </div>
+
+        <div class="inventory-actions">
+            <a class="inventory-btn"
+               href="{{ url_for('business_workspace', business_id=business._id) }}">
+                ← Business Workspace
+            </a>
+
+            {% if role != "worker" %}
+
+            <a class="inventory-btn inventory-btn-primary"
+               href="{{ url_for('add_product', business_id=business._id) }}">
+                + Add Product
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <section class="inventory-stats">
+
+        <div class="inventory-stat">
+            <span class="inventory-stat-icon">📦</span>
+            <div class="inventory-stat-label">Total Products</div>
+            <div class="inventory-stat-value">{{ total_products }}</div>
+            <div class="inventory-stat-note">Physical product records</div>
+        </div>
+
+        <div class="inventory-stat">
+            <span class="inventory-stat-icon">🧮</span>
+            <div class="inventory-stat-label">Total Units</div>
+            <div class="inventory-stat-value">
+                {{ "{:,.0f}".format(total_units) }}
+            </div>
+            <div class="inventory-stat-note">Combined recorded quantities</div>
+        </div>
+
+        <div class="inventory-stat warning">
+            <span class="inventory-stat-icon">⚠️</span>
+            <div class="inventory-stat-label">Low Stock</div>
+            <div class="inventory-stat-value">{{ low_stock_count }}</div>
+            <div class="inventory-stat-note">At or below the stock threshold</div>
+        </div>
+
+        <div class="inventory-stat danger">
+            <span class="inventory-stat-icon">🚫</span>
+            <div class="inventory-stat-label">Out of Stock</div>
+            <div class="inventory-stat-value">{{ out_of_stock_count }}</div>
+            <div class="inventory-stat-note">Quantity is zero or less</div>
+        </div>
+
+    </section>
+
+    <section class="inventory-alerts">
+
+        <div class="inventory-alert">
+            <span class="inventory-alert-icon">⚠️</span>
+            <div>
+                <strong>{{ low_stock_count }} low-stock product(s)</strong>
+                <p>
+                    Review products with quantities at or below their
+                    configured low-stock thresholds.
+                </p>
+            </div>
+        </div>
+
+        <div class="inventory-alert danger">
+            <span class="inventory-alert-icon">🚨</span>
+            <div>
+                <strong>{{ out_of_stock_count }} out-of-stock product(s)</strong>
+                <p>
+                    These products have no available recorded stock.
+                    Consider restocking where necessary.
+                </p>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="inventory-panel">
+
+        <div class="inventory-panel-heading">
+            <div>
+                <h2>Stock Register</h2>
+                <p>Search and review the products in this business.</p>
+            </div>
+            <span class="inventory-status status-in-stock">
+                {{ total_products }} product(s)
+            </span>
+        </div>
+
+        <div class="inventory-filters">
+            <input
+                type="search"
+                id="inventorySearch"
+                class="inventory-search"
+                placeholder="Search by product name or category..."
+                aria-label="Search inventory">
+
+            <select id="inventoryStatus"
+                    class="inventory-select"
+                    aria-label="Filter by stock status">
+                <option value="all">All stock statuses</option>
+                <option value="in stock">In stock</option>
+                <option value="low stock">Low stock</option>
+                <option value="out of stock">Out of stock</option>
+            </select>
+        </div>
+
+        <div class="inventory-table-wrap">
+            <table class="inventory-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        {% if role != "worker" %}
+                        <th>Buying Cost</th>
+                        <th>Stock Value</th>
+                        {% endif %}
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="inventoryTableBody">
+                {% for product in products %}
+                    <tr
+                        data-name="{{ product.get('name', '')|lower }}"
+                        data-category="{{ product.get('category', '')|lower }}"
+                        data-status="{{ product.get('inventory_status', '')|lower }}">
+
+                        <td>
+                            <div class="inventory-product-name">
+                                {{ product.get('name', 'Unnamed product') }}
+                            </div>
+                            {% if product.get('description') %}
+                            <div class="inventory-product-description">
+                                {{ product.get('description') }}
+                            </div>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ product.get('category', 'Uncategorised') }}</td>
+
+                        <td>
+                            {{ "{:,.2f}".format(product.get('quantity', 0)|float) }}
+                        </td>
+
+                        {% if role != "worker" %}
+
+                        <td>
+                            KSh {{ "{:,.2f}".format(product.get('buying_price', 0)|float) }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                KSh {{ "{:,.2f}".format(
+                                    (product.get('quantity', 0)|float) *
+                                    (product.get('buying_price', 0)|float)
+                                ) }}
+                            </strong>
+                        </td>
+                        {% endif %}
+
+                        <td>
+                            {% if product.get('inventory_status') == 'Out of stock' %}
+                                <span class="inventory-status status-out-of-stock">
+                                    Out of stock
+                                </span>
+                            {% elif product.get('inventory_status') == 'Low stock' %}
+                                <span class="inventory-status status-low-stock">
+                                    Low stock
+                                </span>
+                            {% else %}
+                                <span class="inventory-status status-in-stock">
+                                    In stock
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a class="inventory-back"
+                               href="{{ url_for(
+                                   'view_product',
+                                   business_id=business._id,
+                                   product_id=product._id
+                               ) }}">
+                                View →
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="inventory-empty">
+                                <div class="inventory-empty-icon">📦</div>
+                                <h3>No products in your inventory yet</h3>
+                                <p>
+                                    Add your physical products to start monitoring
+                                    quantities, stock costs and stock alerts.
+                                    Services are managed separately.
+                                </p>
+
+                                {% if role != "worker" %}
+                                <a class="inventory-btn inventory-btn-primary"
+                                   href="{{ url_for('add_product', business_id=business._id) }}">
+                                    + Add Your First Product
+                                </a>
+
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                    <tr id="inventoryNoResults" hidden>
+                        <td colspan="7">
+                            <div class="inventory-empty">
+                                <div class="inventory-empty-icon">🔎</div>
+                                <h3>No matching products</h3>
+                                <p>Try another search term or stock status.</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {% if role != "worker" %}
+
+        <div class="inventory-table-footer">
+            Stock value is calculated using quantity × buying cost.
+            It represents recorded stock cost, not sales revenue or profit.
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+<footer>
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW"
+        class="footer-logo">
+
+    <p>© 2026 BIZFLOW. All rights reserved.</p>
+    <p class="footer-tagline">Manage • Track • Grow</p>
+</footer>
+
+<script>
+    const searchInput = document.getElementById("inventorySearch");
+    const statusFilter = document.getElementById("inventoryStatus");
+    const tableBody = document.getElementById("inventoryTableBody");
+    const noResults = document.getElementById("inventoryNoResults");
+
+    function filterInventory() {
+        const query = searchInput.value.trim().toLowerCase();
+        const selectedStatus = statusFilter.value;
+        const rows = tableBody.querySelectorAll("tr[data-status]");
+        let visibleCount = 0;
+
+        rows.forEach((row) => {
+            const name = row.dataset.name || "";
+            const category = row.dataset.category || "";
+            const status = row.dataset.status || "";
+
+            const matchesSearch =
+                name.includes(query) || category.includes(query);
+
+            const matchesStatus =
+                selectedStatus === "all" || status === selectedStatus;
+
+            const showRow = matchesSearch && matchesStatus;
+            row.hidden = !showRow;
+
+            if (showRow) visibleCount++;
+        });
+
+        noResults.hidden = visibleCount !== 0;
+    }
+
+    searchInput.addEventListener("input", filterInventory);
+    statusFilter.addEventListener("change", filterInventory);
+</script>
+
+</body>
+</html>
+

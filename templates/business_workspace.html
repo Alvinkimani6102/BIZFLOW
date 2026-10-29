@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+
+      <a href="{% if session.get('role') == 'worker' %}{{ url_for('business_workspace', business_id=business._id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="brand">
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW Logo"
+    >
+</a>
+
+                <nav>
+
+            {% if session.get("role") != "worker" %}
+                <a href="/dashboard">
+                    Dashboard
+                </a>
+            {% endif %}
+
+            <a href="/logout" class="signup-button">
+                Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- BUSINESS WORKSPACE -->
+
+    <main class="workspace-page">
+
+        <div class="workspace-container">
+
+            <!-- BUSINESS HEADER -->
+
+            <section class="workspace-header">
+
+                <div>
+
+                    <p class="workspace-label">
+                        BUSINESS WORKSPACE
+                    </p>
+
+                    <h1>
+                        {{ business.name }}
+                    </h1>
+
+                    <p class="workspace-description">
+
+                        {{ business.description
+                           if business.description
+                           else "Manage your business from one place." }}
+
+                    </p>
+
+                </div>
+
+                <span class="workspace-type">
+                    {{ business.type }}
+                </span>
+
+            </section>
+
+
+            <!-- OVERVIEW -->
+
+            <section class="workspace-section">
+
+                <h2>
+                    Business Overview
+                </h2>
+
+                <div class="workspace-grid">
+
+
+                    <!-- PRODUCTS -->
+
+                    <div class="workspace-card">
+
+                        <div class="workspace-card-icon">
+                            📦
+                        </div>
+
+                        <h3>
+                            Products
+                        </h3>
+
+                        <p>
+                            Manage your physical products,
+                            prices, costs and inventory.
+                        </p>
+
+                       <a href="{{ url_for('products', business_id=business._id) }}">
+    Manage Products →
+</a>
+
+                    </div>
+
+
+                    <!-- SERVICES -->
+
+                    {% if session.get("role") != "worker" %}
+
+                    <div class="workspace-card">
+
+                        <div class="workspace-card-icon">
+                            🛠️
+                        </div>
+
+                        <h3>
+                            Services
+                        </h3>
+
+                        <p>
+                            Manage the services your
+                            business provides to customers.
+                        </p>
+
+                        <a href="{{ url_for('services',
+                    business_id=business._id) }}">
+    Manage Services →
+</a>
+
+                    </div>
+
+                    {% endif %}
+
+                    <!-- BOOKINGS -->
+
+<div class="workspace-card">
+
+    <div class="workspace-card-icon">
+        📅
+    </div>
+
+    <h3>
+        Bookings
+    </h3>
+
+    <p>
+        Manage customer appointments,
+        schedules and service bookings.
+    </p>
+
+    <a href="{{ url_for('bookings', business_id=business._id) }}">
+    Manage Bookings →
+</a>
+
+</div>
+
+
+
+                    <!-- ORDERS -->
+
+                    <div class="workspace-card">
+
+                        <div class="workspace-card-icon">
+                            📋
+                        </div>
+
+                        <h3>
+                            Orders
+                        </h3>
+
+                        <p>
+                            Manage customer orders, track production
+                            and delivery, record payments, and monitor
+                            order progress.
+                        </p>
+
+                        <a href="{{ url_for('business_orders', business_id=business._id) }}">
+                            Manage Orders →
+                        </a>
+
+                    </div>
+
+
+
+                    <!-- SALES -->
+
+                    <div class="workspace-card">
+
+                        <div class="workspace-card-icon">
+                            💰
+                        </div>
+
+                        <h3>
+                            Sales
+                        </h3>
+
+                        <p>
+                            Record sales and track
+                            your business revenue.
+                        </p>
+
+                        
+                        <a href="{{ url_for('sales_history', business_id=business._id) }}">
+                           View Sales History →
+                             </a>
+
+
+                    </div>
+
+
+                    <!-- EXPENSES -->
+                     {% if session.get("role") != "worker" %}
+
+                    <div class="workspace-card">
+
+                        <div class="workspace-card-icon">
+                            💳
+                        </div>
+
+                        <h3>
+                            Expenses
+                        </h3>
+
+                        <p>
+                            Record and monitor your
+                            business expenses.
+                        </p>
+
+                       <a href="{{ url_for('expenses', business_id=business._id) }}">
+    Manage Expenses →
+</a>
+
+                    </div>
+                    {% endif %}
+
+
+                    <!-- INVENTORY -->
+
+                    <div class="workspace-card">
+
+                        <div class="workspace-card-icon">
+                            📊
+                        </div>
+
+                        <h3>
+                            Inventory
+                        </h3>
+
+                        <p>
+                            Monitor stock levels and
+                            inventory movements.
+                        </p>
+
+                        
+<a href="{{ url_for('view_inventory', business_id=business._id) }}">
+    View Inventory →
+</a>
+
+
+                    </div>
+
+
+                    <!-- REPORTS -->
+                     {% if session.get("role") != "worker" %}
+
+                    <div class="workspace-card">
+
+                        <div class="workspace-card-icon">
+                            📈
+                        </div>
+
+                        <h3>
+                            Reports & Analytics
+                        </h3>
+
+                        <p>
+                            Understand revenue,
+                            expenses and profitability.
+                        </p>
+
+                       <a href="{{ url_for('reports', business_id=business._id) }}">
+                         View Reports →
+                             </a>
+
+                    </div>
+                    {% endif %}
+
+                    
+<!-- LOANS & REPAYMENTS -->
+
+<div class="workspace-card">
+
+    <div class="workspace-card-icon">
+        💵
+    </div>
+
+    <h3>
+        Loans & Repayments
+    </h3>
+
+    <p>
+        Track customer credit sales, outstanding balances,
+        and partial or full repayments.
+    </p>
+
+    <a href="{{ url_for('business_loans', business_id=business._id) }}">
+        Manage Loans →
+    </a>
+
+</div>
+
+
+<!-- MANAGE WORKERS -->
+ {% if session.get("role") != "worker" %}
+
+<div class="workspace-card">
+
+    <div class="workspace-card-icon">
+        👥
+    </div>
+
+    <h3>
+        Manage Workers
+    </h3>
+
+    <p>
+        Create worker accounts, manage staff access, and
+        allow employees to record sales while keeping
+        confidential business finances private.
+    </p>
+
+    <a href="{{ url_for('manage_workers', business_id=business._id) }}">
+        Manage Workers →
+    </a>
+
+  </div>
+  {% endif %}
+
+  
+  
+<!-- SUPER ADMIN PANEL -->
+{% if session.get("user_email", "")|lower == "kimanialvin2003@gmail.com" %}
+
+<div class="workspace-card">
+
+    <div class="workspace-card-icon">
+        🛡️
+    </div>
+
+    <h3>
+        Super Admin Panel
+    </h3>
+
+    <p>
+        Manage BIZFLOW accounts, inspect business records,
+        monitor database usage, send announcements, and
+        manage system maintenance.
+    </p>
+
+    <a href="{{ url_for('admin_panel') }}">
+        Open Admin Panel →
+    </a>
+
+</div>
+
+{% endif %}
+
+
+
+
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Business Services | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .admin-services-container {
+            max-width: 1400px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .admin-services-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .admin-services-header h1 {
+            margin: 0 0 8px;
+            color: #0f172a;
+        }
+
+        .admin-services-header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .admin-services-button {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #1d4ed8;
+            color: white;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .admin-services-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .admin-services-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .admin-services-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .admin-services-table th,
+        .admin-services-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .admin-services-table th {
+            background: #f8fafc;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        .admin-services-table td {
+            color: #334155;
+        }
+
+        .admin-services-count {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 6px 10px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .admin-services-empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .admin-services-container {
+                margin: 15px auto;
+                padding: 12px;
+            }
+
+            .admin-services-card {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="brand">
+        <a href="{{ url_for('admin_panel') }}"
+           style="text-decoration:none;color:inherit;">
+            BIZFLOW
+        </a>
+    </div>
+</header>
+
+<main class="admin-services-container">
+
+    <div class="admin-services-header">
+        <div>
+            <h1>Business Services</h1>
+            <p>Business: <strong>{{ business.name }}</strong></p>
+            <p style="margin-top:6px;">
+                Administrator view — records are read-only.
+            </p>
+        </div>
+
+        <a class="admin-services-button"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+    </div>
+
+    <section class="admin-services-card">
+
+        <span class="admin-services-count">
+            Services found: {{ services_list|length }}
+        </span>
+
+        {% if services_list %}
+
+        <div class="admin-services-table-wrapper">
+            <table class="admin-services-table">
+                <thead>
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for service in services_list %}
+                    <tr>
+                        <td>
+                            <strong>
+                                {{ service.get('name', 'Unnamed service') }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ service.get('description', '—') or '—' }}
+                        </td>
+
+                        <td>
+                            {% set price = service.get('price', service.get('selling_price')) %}
+                            {% if price is not none and price != '' %}
+                                KSh {{ price }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ service.get('duration', '—') or '—' }}
+                        </td>
+
+                        <td>
+                            {{ service.get('status', 'Active') or 'Active' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+
+        <div class="admin-services-empty">
+            <h3>No services found</h3>
+            <p>This business does not have any matching service records yet.</p>
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+</body>
+</html>

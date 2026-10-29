@@ -1,0 +1,629 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Orders | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+
+          
+<style>
+    .order-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 15px 0;
+    }
+
+    .order-record {
+    border-bottom: 1px solid #999;
+    padding: 12px 0;
+}
+
+body.printing-one-order .order-record:not(.print-target) {
+    display: none !important;
+}
+
+body.printing-one-order .print-target {
+    display: block !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+    @media print {
+        body {
+            background: white !important;
+            color: black !important;
+        }
+
+        .navbar,
+        footer,
+        .no-print,
+        form,
+        .signup-button {
+            display: none !important;
+        }
+
+        .workspace-page,
+        .workspace-container,
+        .workspace-section,
+        .workspace-card {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            background: white !important;
+        }
+
+        .order-record {
+            border-bottom: 1px solid #999;
+            padding: 12px 0;
+        }
+
+        h1, h2, h3, h4 {
+            color: black !important;
+        }
+
+        button,
+        a {
+            display: none !important;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a href="{{ url_for('business_workspace', business_id=business._id) }}"
+           class="brand">
+
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW Logo"
+            >
+
+        </a>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business._id) }}">
+                Business Workspace
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="signup-button">
+                Logout
+            </a>
+        </nav>
+
+    </header>
+
+    <main class="workspace-page">
+
+        <div class="workspace-container">
+
+            <section class="workspace-header">
+
+                <div>
+
+                    <p class="workspace-label">
+                        ORDER MANAGEMENT
+                    </p>
+
+                    <h1>
+                        Orders
+                    </h1>
+
+                    <p class="workspace-description">
+                        {{ business.name }} — manage customer orders,
+                        quantities, delivery and payments.
+                    </p>
+
+                </div>
+
+                <span class="workspace-type">
+                    {% if role == "owner" %}
+                        Owner
+                    {% else %}
+                        Worker
+                    {% endif %}
+                </span>
+
+            </section>
+
+           
+<section class="workspace-section">
+
+    <div class="section-header">
+        <div>
+            <h2>Customer Orders</h2>
+            <p>Create and track orders from schools, institutions, and other customers.</p>
+        </div>
+    </div>
+
+    {% if role == "owner" %}
+
+    <div class="workspace-card">
+
+        <h3>Create New Order</h3>
+
+        <p>
+            Record the customer, ordered items, agreed price,
+            production cost, deposit, and delivery details.
+        </p>
+
+        <form method="POST"
+              action="{{ url_for('create_order', business_id=business._id) }}">
+
+            <div class="form-group">
+                <label for="customer_name">Customer or Institution</label>
+                <input type="text"
+                       id="customer_name"
+                       name="customer_name"
+                       placeholder="e.g. Green Valley School"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label for="customer_contact">Customer Contact</label>
+                <input type="text"
+                       id="customer_contact"
+                       name="customer_contact"
+                       placeholder="Phone number or email">
+            </div>
+
+            <div class="form-group">
+                <label for="order_description">Order Description</label>
+                <textarea id="order_description"
+                          name="order_description"
+                          placeholder="Describe the order or special instructions"
+                          rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="agreed_total">Total Agreed Order Price (KSh)</label>
+                <input type="number"
+                       id="agreed_total"
+                       name="agreed_total"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="Enter the agreed price"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label for="deposit">Deposit Received (KSh)</label>
+                <input type="number"
+                       id="deposit"
+                       name="deposit"
+                       min="0"
+                       step="0.01"
+                       value="0"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label for="production_status">Production Status</label>
+                <select id="production_status"
+                        name="production_status"
+                        required>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="delivery_status">Delivery Status</label>
+                <select id="delivery_status"
+                        name="delivery_status"
+                        required>
+                    <option value="Not Delivered">Not Delivered</option>
+                    <option value="Partially Delivered">Partially Delivered</option>
+                    <option value="Delivered">Delivered</option>
+                </select>
+            </div>
+
+            
+<div class="order-items-section">
+
+    <h3>Order Items</h3>
+
+    <p>Add each product included in this customer order.</p>
+
+    <div id="order-items-container">
+
+        <div class="order-item-row">
+
+            <div class="form-group">
+                <label>Item Name</label>
+                <input type="text"
+                       name="item_name[]"
+                       placeholder="e.g. School shirts"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number"
+                       name="item_quantity[]"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="e.g. 100"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Unit</label>
+                <select name="item_unit[]" required>
+                    <option value="pieces">Pieces</option>
+                    <option value="pairs">Pairs</option>
+                    <option value="boxes">Boxes</option>
+                    <option value="kilograms">Kilograms (kg)</option>
+                    <option value="grams">Grams (g)</option>
+                    <option value="litres">Litres (L)</option>
+                    <option value="millilitres">Millilitres (ml)</option>
+                    <option value="metres">Metres (m)</option>
+                    <option value="centimetres">Centimetres (cm)</option>
+                    <option value="sets">Sets</option>
+                    <option value="packets">Packets</option>
+                    <option value="rolls">Rolls</option>
+                    <option value="services">Services</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Selling Price per Unit (KSh)</label>
+                <input type="number"
+                       name="item_selling_price[]"
+                       min="0"
+                       step="0.01"
+                       placeholder="Price per unit"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Production Cost per Unit (KSh)</label>
+                <input type="number"
+                       name="item_unit_cost[]"
+                       min="0"
+                       step="0.01"
+                       placeholder="Cost per unit"
+                       required>
+            </div>
+
+            <button type="button"
+                    class="remove-order-item"
+                    onclick="removeOrderItem(this)">
+                Remove Item
+            </button>
+
+            <hr>
+
+        </div>
+
+    </div>
+
+    <button type="button"
+            class="signup-button"
+            onclick="addOrderItem()">
+        + Add Another Item
+    </button>
+
+</div>
+
+
+            <button type="submit" class="signup-button">
+                Create Order
+            </button>
+
+        </form>
+
+    </div>
+
+    {% else %}
+
+    <p>
+        Workers can view and process orders here. Only the business
+        owner can create orders and access production costs and profits.
+    </p>
+
+    {% endif %}
+
+    
+<div class="workspace-card">
+
+    <h3>Order Records</h3>
+
+    {% if orders %}
+
+        {% for order in orders %}
+
+            <div class="order-record">
+
+                
+<div class="order-actions no-print">
+
+    <button type="button"
+        class="signup-button"
+        onclick="printOrder(this)">
+    Print Order
+</button>
+
+    {% if role == "owner" %}
+
+        <a href="{{ url_for('edit_order', business_id=business._id, order_id=order._id) }}"
+           class="signup-button">
+            Edit Order
+        </a>
+
+    {% endif %}
+
+</div>
+
+
+                <hr>
+
+                <h3>{{ order.customer_name }}</h3>
+
+                <p>
+                    <strong>Order Date:</strong>
+                    {{ order.created_at.strftime('%d %b %Y') if order.created_at else 'N/A' }}
+                </p>
+
+                {% if order.customer_contact %}
+                    <p>
+                        <strong>Contact:</strong>
+                        {{ order.customer_contact }}
+                    </p>
+                {% endif %}
+
+                {% if order.order_description %}
+                    <p>{{ order.order_description }}</p>
+                {% endif %}
+
+                <h4>Items</h4>
+
+                {% for item in order.get('items', []) %}
+
+                    <div class="order-item-summary">
+
+                        <p>
+                            <strong>{{ item.name }}</strong>
+                        </p>
+
+                        <p>
+                            Quantity: {{ item.quantity }} {{ item.unit }}
+                        </p>
+
+                        <p>
+                            Item selling total:
+                            KSh {{ "%.2f"|format(item.line_total|float) }}
+                        </p>
+
+                        {% if role == "owner" %}
+                            <p>
+                                Production cost:
+                                KSh {{ "%.2f"|format(item.line_cost|float) }}
+                            </p>
+
+                            <p>
+                                Item profit:
+                                KSh {{ "%.2f"|format(item.line_profit|float) }}
+                            </p>
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+                <hr>
+
+                <p>
+                    <strong>Agreed Order Price:</strong>
+                    KSh {{ "%.2f"|format(order.agreed_total|float) }}
+                </p>
+
+                <p>
+                    <strong>Total Paid:</strong>
+                    KSh {{ "%.2f"|format(order.total_paid|float) }}
+                </p>
+
+                <p>
+                    <strong>Outstanding Balance:</strong>
+                    KSh {{ "%.2f"|format(order.balance|float) }}
+                </p>
+
+                <p>
+                    <strong>Payment Status:</strong>
+                    {{ order.payment_status }}
+                </p>
+
+                {% if role == "owner" %}
+
+                    <p>
+                        <strong>Total Production Cost:</strong>
+                        KSh {{ "%.2f"|format(order.total_cost|float) }}
+                    </p>
+
+                    <p>
+                        <strong>Expected Profit:</strong>
+                        KSh {{ "%.2f"|format(order.total_profit|float) }}
+                    </p>
+
+                {% endif %}
+
+                <p>
+                    <strong>Production:</strong>
+                    {{ order.production_status }}
+                </p>
+
+                <p>
+                    <strong>Delivery:</strong>
+                    {{ order.delivery_status }}
+                </p>
+
+                <h4>Payment History</h4>
+
+                {% if order.get('payments') %}
+
+                    {% for payment in order.payments %}
+
+                        <p>
+                            {{ payment.payment_type }} —
+                            KSh {{ "%.2f"|format(payment.amount|float) }}
+                            {% if payment.created_at %}
+                                — {{ payment.created_at.strftime('%d %b %Y') }}
+                            {% endif %}
+                        </p>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <p>No payments recorded.</p>
+
+                {% endif %}
+
+                {% if role == "owner" and order.balance|float > 0 %}
+
+                    <form method="POST"
+                          action="{{ url_for('record_order_payment', business_id=business._id, order_id=order._id) }}">
+
+                        <div class="form-group">
+
+                            <label>
+                                Record Additional Payment (KSh)
+                            </label>
+
+                            <input type="number"
+                                   name="amount"
+                                   min="0.01"
+                                   max="{{ order.balance }}"
+                                   step="0.01"
+                                   placeholder="Enter payment amount"
+                                   required>
+
+                        </div>
+
+                        <button type="submit" class="signup-button">
+                            Record Payment
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No orders have been recorded for this business yet.</p>
+
+    {% endif %}
+
+</div>
+  
+
+</section>
+
+
+     </div>
+
+     </main>
+
+     <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>© 2026 BIZFLOW. All rights reserved.</p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+    
+<script>
+    function addOrderItem() {
+        const container = document.getElementById("order-items-container");
+        const firstRow = container.querySelector(".order-item-row");
+
+        if (!firstRow) {
+            return;
+        }
+
+        const newRow = firstRow.cloneNode(true);
+
+        newRow.querySelectorAll("input").forEach(function (input) {
+            input.value = "";
+        });
+
+        newRow.querySelectorAll("select").forEach(function (select) {
+            select.selectedIndex = 0;
+        });
+
+        container.appendChild(newRow);
+    }
+
+    function removeOrderItem(button) {
+        const container = document.getElementById("order-items-container");
+        const rows = container.querySelectorAll(".order-item-row");
+
+        if (rows.length === 1) {
+            alert("An order must contain at least one item.");
+            return;
+        }
+
+        button.closest(".order-item-row").remove();
+    }
+
+    function printOrder(button) {
+    const selectedOrder = button.closest(".order-record");
+
+    if (!selectedOrder) {
+        alert("Could not find this order to print.");
+        return;
+    }
+
+    document.querySelectorAll(".order-record").forEach(function(order) {
+        order.classList.remove("print-target");
+    });
+
+    selectedOrder.classList.add("print-target");
+    document.body.classList.add("printing-one-order");
+
+    window.print();
+}
+
+window.addEventListener("afterprint", function() {
+    document.body.classList.remove("printing-one-order");
+
+    document.querySelectorAll(".order-record").forEach(function(order) {
+        order.classList.remove("print-target");
+    });
+});
+</script>
+</body>
+
+
+</body>
+
+</html>

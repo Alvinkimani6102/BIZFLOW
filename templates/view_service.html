@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ service.name }} - BIZFLOW</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     NAVBAR
+========================= -->
+
+<nav class="navbar">
+
+    <div class="navbar-container">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="brand"
+        >
+
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW"
+            >
+
+        </a>
+
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =========================
+     SERVICE PAGE
+========================= -->
+
+<main class="service-view-page">
+
+    <div class="service-view-container">
+
+
+        <!-- BACK LINK -->
+
+        <a
+            href="{{ url_for(
+                'services',
+                business_id=business._id
+            ) }}"
+            class="service-back-link"
+        >
+            ← Back to Services
+        </a>
+
+
+
+        <!-- =========================
+             SERVICE HEADER
+        ========================= -->
+
+        <section class="service-view-header">
+
+
+            <div class="service-header-icon">
+
+                <span>⚙</span>
+
+            </div>
+
+
+            <div class="service-header-content">
+
+                <span class="service-label">
+                    SERVICE
+                </span>
+
+                <h1>
+                    {{ service.name }}
+                </h1>
+
+                <p>
+                    {{ service.description or
+                    "No description provided." }}
+                </p>
+
+            </div>
+
+
+            <div class="service-status">
+
+                {% if service.available %}
+
+                    <span class="service-status available">
+                        <span class="status-dot"></span>
+                        Available
+                    </span>
+
+                {% else %}
+
+                    <span class="service-status unavailable">
+                        <span class="status-dot"></span>
+                        Unavailable
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================
+             SERVICE INFORMATION
+        ========================= -->
+
+        <section class="service-information-section">
+
+            <div class="service-section-heading">
+
+                <div>
+
+                    <span class="service-section-label">
+                        SERVICE INFORMATION
+                    </span>
+
+                    <h2>
+                        Service Details
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="service-details-grid">
+
+
+                <!-- CATEGORY -->
+
+                <div class="service-detail-card">
+
+                    <div class="service-detail-icon">
+                        📁
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Category
+                        </span>
+
+                        <strong>
+                            {{ service.category or
+                            "Uncategorized" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- COST -->
+
+                <div class="service-detail-card">
+
+                    <div class="service-detail-icon">
+                        💰
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Service Cost
+                        </span>
+
+                        <strong>
+                            KSh {{ "%.2f"|format(
+                                service.cost
+                            ) }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CUSTOMER PRICE -->
+
+                <div class="service-detail-card">
+
+                    <div class="service-detail-icon">
+                        💳
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Customer Price
+                        </span>
+
+                        <strong>
+                            KSh {{ "%.2f"|format(
+                                service.selling_price
+                            ) }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- DURATION -->
+
+                <div class="service-detail-card">
+
+                    <div class="service-detail-icon">
+                        ⏱
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Duration
+                        </span>
+
+                        <strong>
+                            {{ service.duration or
+                            "Not specified" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             FINANCIAL SUMMARY
+        ========================= -->
+
+        <section class="service-financial-card">
+
+
+            <div class="financial-header">
+
+                <div>
+
+                    <span class="service-section-label">
+                        FINANCIAL OVERVIEW
+                    </span>
+
+                    <h2>
+                        Service Financial Summary
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="financial-list">
+
+
+                <!-- CUSTOMER PRICE -->
+
+                <div class="financial-row">
+
+                    <div>
+
+                        <span>
+                            Customer Price
+                        </span>
+
+                        <small>
+                            Amount charged to the customer
+                        </small>
+
+                    </div>
+
+                    <strong>
+                        KSh {{ "%.2f"|format(
+                            service.selling_price
+                        ) }}
+                    </strong>
+
+                </div>
+
+
+
+                <!-- SERVICE COST -->
+
+                <div class="financial-row">
+
+                    <div>
+
+                        <span>
+                            Service Cost
+                        </span>
+
+                        <small>
+                            Cost incurred by the business
+                        </small>
+
+                    </div>
+
+                    <strong>
+                        KSh {{ "%.2f"|format(
+                            service.cost
+                        ) }}
+                    </strong>
+
+                </div>
+
+
+
+                <!-- PROFIT -->
+
+                <div class="financial-row profit-row">
+
+                    <div>
+
+                        <span>
+                            Expected Profit
+                        </span>
+
+                        <small>
+                            Customer price minus service cost
+                        </small>
+
+                    </div>
+
+                    <strong>
+                        KSh {{ "%.2f"|format(
+                            service.selling_price -
+                            service.cost
+                        ) }}
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+       <!-- =========================
+     ACTIONS
+========================= -->
+
+<div class="service-view-actions">
+
+    <a
+        href="{{ url_for(
+            'edit_service',
+            business_id=business._id,
+            service_id=service._id
+        ) }}"
+        class="service-edit-button"
+    >
+        ✏ Edit Service
+    </a>
+
+
+    <!-- DELETE SERVICE -->
+
+    <!-- DELETE SERVICE -->
+
+<button
+    type="button"
+    class="service-delete-button"
+    onclick="showDeleteServiceModal()"
+>
+    🗑 Delete Service
+</button>
+
+
+    <a
+        href="{{ url_for(
+            'services',
+            business_id=business._id
+        ) }}"
+        class="service-secondary-button"
+    >
+        Back to Services
+    </a>
+
+</div>
+
+
+    </div>
+
+</main>
+
+<!-- =========================
+     DELETE SERVICE MODAL
+========================= -->
+
+<div
+    id="deleteServiceModal"
+    class="delete-service-modal"
+>
+
+    <div class="delete-service-box">
+
+        <div class="delete-service-icon">
+            🗑
+        </div>
+
+        <h2>
+            Delete Service?
+        </h2>
+
+        <p>
+            Are you sure you want to delete
+            <strong>{{ service.name }}</strong>?
+        </p>
+
+        <p class="delete-warning">
+            This action cannot be undone.
+        </p>
+
+
+        <div class="delete-service-actions">
+
+            <button
+                type="button"
+                class="cancel-delete-button"
+                onclick="hideDeleteServiceModal()"
+            >
+                Cancel
+            </button>
+
+            <!-- Backend delete will be connected later -->
+
+           <form
+    method="POST"
+    action="{{ url_for(
+        'delete_service',
+        business_id=business._id,
+        service_id=service._id
+    ) }}"
+    style="display: inline;"
+>
+    <button
+        type="submit"
+        class="confirm-delete-button"
+    >
+        Delete Service
+    </button>
+</form>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+    function showDeleteServiceModal() {
+
+        document.getElementById(
+            "deleteServiceModal"
+        ).classList.add("show");
+
+    }
+
+
+    function hideDeleteServiceModal() {
+
+        document.getElementById(
+            "deleteServiceModal"
+        ).classList.remove("show");
+
+    }
+
+
+    
+
+    // Close modal when clicking outside the box
+
+    document.getElementById(
+        "deleteServiceModal"
+    ).addEventListener("click", function(event) {
+
+        if (event.target === this) {
+
+            hideDeleteServiceModal();
+
+        }
+
+    });
+
+</script>
+</body>
+
+</html>

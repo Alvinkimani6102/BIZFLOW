@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ product.name }} | BIZFLOW
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static',
+                           filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a href="/dashboard" class="brand">
+
+        <img
+            src="{{ url_for('static',
+                            filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW Logo"
+        >
+
+    </a>
+
+    <nav>
+
+        <a href="{{ url_for('products',
+                            business_id=business._id) }}">
+            Products
+        </a>
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/logout"
+           class="signup-button">
+            Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="product-view-page">
+
+    <div class="product-view-container">
+
+        <div class="product-view-header">
+
+            <div>
+
+                <p class="workspace-label">
+                    {{ business.name }}
+                </p>
+
+                <h1>
+                    {{ product.name }}
+                </h1>
+
+                <p>
+                    {{ product.description
+                       if product.description
+                       else "No description provided." }}
+                </p>
+
+            </div>
+
+           
+<div class="product-actions">
+
+    <a
+        href="{{ url_for('edit_product',
+                        business_id=business._id,
+                        product_id=product._id) }}"
+        class="primary-button"
+    >
+        Edit Product
+    </a>
+
+    <a
+        href="{{ url_for('restock_product',
+                        business_id=business._id,
+                        product_id=product._id) }}"
+        class="primary-button restock-button-link"
+    >
+        + Restock Product
+    </a>
+
+    <form
+        action="{{ url_for('delete_product',
+                           business_id=business._id,
+                           product_id=product._id) }}"
+        method="POST"
+        onsubmit="return confirm('Are you sure you want to delete this product?');"
+        style="display: inline;"
+    >
+        <button
+            type="submit"
+            class="delete-button"
+        >
+            Delete Product
+        </button>
+    </form>
+
+</div>
+
+
+        </div>
+
+
+        <section class="product-details-grid">
+
+
+            <div class="product-detail-card">
+
+                <span>
+                    Category
+                </span>
+
+                <strong>
+                    {{ product.category }}
+                </strong>
+
+            </div>
+
+
+            <div class="product-detail-card">
+
+                <span>
+                    Buying Price
+                </span>
+
+                <strong>
+                    KSh {{ "%.2f"|format(product.buying_price) }}
+                </strong>
+
+            </div>
+
+
+            <div class="product-detail-card">
+
+                <span>
+                    Selling Price
+                </span>
+
+                <strong>
+                    KSh {{ "%.2f"|format(product.selling_price) }}
+                </strong>
+
+            </div>
+
+
+            <div class="product-detail-card">
+
+                <span>
+                    Current Stock
+                </span>
+
+                <strong>
+                    {{ product.quantity }}
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+        <section class="product-information">
+
+            <h2>
+                Stock Information
+            </h2>
+
+            <div class="stock-information">
+
+                <div>
+
+                    <span>
+                        Current Quantity
+                    </span>
+
+                    <strong>
+                        {{ product.quantity }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Low Stock Alert
+                    </span>
+
+                    <strong>
+                        {{ product.low_stock_threshold }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Stock Status
+                    </span>
+
+                    {% if product.quantity == 0 %}
+
+                        <strong class="stock-status out-of-stock">
+                            Out of Stock
+                        </strong>
+
+                    {% elif product.quantity <= product.low_stock_threshold %}
+
+                        <strong class="stock-status low-stock">
+                            Low Stock
+                        </strong>
+
+                    {% else %}
+
+                        <strong class="stock-status in-stock">
+                            In Stock
+                        </strong>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="product-back">
+
+            <a href="{{ url_for('products',
+                                business_id=business._id) }}">
+
+                ← Back to Products
+
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <img
+        src="{{ url_for('static',
+                        filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW"
+        class="footer-logo"
+    >
+
+    <p>
+        © 2026 BIZFLOW. All rights reserved.
+    </p>
+
+    <p class="footer-tagline">
+        Manage • Track • Grow
+    </p>
+
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>View Booking - BIZFLOW</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <main class="booking-view-page">
+
+        <div class="booking-view-container">
+
+            <!-- HEADER -->
+            <div class="booking-view-header">
+
+                <div>
+                    <span class="bookings-label">
+                        BOOKING MANAGEMENT
+                    </span>
+
+                    <h1>Booking Details</h1>
+
+                    <p>
+                        View the complete details of this booking.
+                    </p>
+                </div>
+
+                <div>
+                    <a
+                        href="{{ url_for('bookings', business_id=business._id) }}"
+                        class="booking-back-button"
+                    >
+                        ← Back to Bookings
+                    </a>
+                </div>
+
+            </div>
+
+
+            <!-- CUSTOMER INFORMATION -->
+            <section class="booking-detail-section">
+
+                <div class="booking-detail-section-header">
+                    <h2>Customer Information</h2>
+                </div>
+
+                <div class="booking-detail-grid">
+
+                    <div class="booking-detail-card">
+                        <span>Customer Name</span>
+                        <strong>{{ booking.customer }}</strong>
+                    </div>
+
+                    <div class="booking-detail-card">
+                        <span>Phone Number</span>
+                        <strong>{{ booking.contact }}</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- BOOKING INFORMATION -->
+            <section class="booking-detail-section">
+
+                <div class="booking-detail-section-header">
+                    <h2>Booking Information</h2>
+                </div>
+
+                <div class="booking-detail-grid">
+
+                    <div class="booking-detail-card">
+                        <span>Service</span>
+                        <strong>{{ booking.service }}</strong>
+                    </div>
+
+                    <div class="booking-detail-card">
+                        <span>Date</span>
+                        <strong>{{ booking.booking_date }}</strong>
+                    </div>
+
+                    <div class="booking-detail-card">
+                        <span>Time</span>
+                        <strong>{{ booking.booking_time }}</strong>
+                    </div>
+
+                    <div class="booking-detail-card">
+                        <span>Duration</span>
+                        <strong>{{ booking.duration }} minutes</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- PAYMENT INFORMATION -->
+            <section class="booking-detail-section">
+
+                <div class="booking-detail-section-header">
+                    <h2>Payment Information</h2>
+                </div>
+
+                <div class="booking-detail-grid">
+
+                    <div class="booking-detail-card">
+    <span>Balance</span>
+
+    <strong>
+        KSh {{ "%.2f"|format(
+            booking.amount -
+            booking.get("amount_paid", 0)
+        ) }}
+    </strong>
+
+    {% if booking.amount - booking.get("amount_paid", 0) > 0 %}
+        <small>Outstanding payment</small>
+    {% else %}
+        <small>Fully paid</small>
+    {% endif %}
+</div>
+
+                    <div class="booking-detail-card">
+                        <span>Amount Paid</span>
+                        <strong>
+                            KSh {{ "%.2f"|format(
+                                booking.get("amount_paid", 0)
+                            ) }}
+                        </strong>
+                    </div>
+
+                    <div class="booking-detail-card">
+                        <span>Balance</span>
+                        <strong>
+                            KSh {{ "%.2f"|format(
+                                booking.amount -
+                                booking.get("amount_paid", 0)
+                            ) }}
+                        </strong>
+                    </div>
+
+                    <div class="booking-detail-card">
+    <span>Payment Status</span>
+
+    <strong class="booking-status {{ booking.payment_status|lower|replace(' ', '-') }}">
+        {{ booking.payment_status }}
+    </strong>
+</div>
+
+                </div>
+
+            </section>
+
+
+            <!-- BOOKING STATUS -->
+            <section class="booking-detail-section">
+
+                <div class="booking-detail-section-header">
+                    <h2>Booking Status</h2>
+                </div>
+
+                <div class="booking-detail-status">
+
+    <span>Status</span>
+
+    <strong class="booking-status {{ booking.status|lower|replace(' ', '-') }}">
+        {{ booking.status }}
+    </strong>
+
+</div>
+
+            </section>
+
+
+            <!-- ACTIONS -->
+            <section class="booking-detail-actions">
+
+                <a
+                    href="{{ url_for(
+                        'edit_booking',
+                        business_id=business._id,
+                        booking_id=booking._id
+                    ) }}"
+                    class="booking-edit-button"
+                >
+                    ✏ Edit Booking
+                </a>
+
+                <a
+                    href="{{ url_for('bookings', business_id=business._id) }}"
+                    class="booking-back-button"
+                >
+                    ← Back to Bookings
+                </a>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

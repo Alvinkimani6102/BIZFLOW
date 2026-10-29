@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Services | {{ business.name }} | BIZFLOW
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================
+     NAVBAR
+========================================= -->
+
+<nav class="navbar">
+
+    <div class="navbar-container">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="brand"
+        >
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename='images/bizflow-logo.png'
+                ) }}"
+                alt="BIZFLOW Logo"
+            >
+
+        </a>
+
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a
+                href="{{ url_for(
+                    'business_workspace',
+                    business_id=business._id
+                ) }}"
+            >
+                Business
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =========================================
+     SERVICES PAGE
+========================================= -->
+
+<main class="services-page">
+
+    <div class="services-container">
+
+
+        <!-- =================================
+             PAGE HEADER
+        ================================== -->
+
+        <section class="services-page-header">
+
+            <div>
+
+                <span class="services-workspace-label">
+                    {{ business.name }}
+                </span>
+
+                <h1>
+                    Services
+                </h1>
+
+                <p>
+                    Manage your services, pricing,
+                    availability and customer bookings.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for(
+                    'add_service',
+                    business_id=business._id
+                ) }}"
+                class="services-primary-button"
+            >
+                <span>+</span>
+                Add Service
+            </a>
+
+        </section>
+
+
+
+        <!-- =================================
+             SERVICE STATISTICS
+        ================================== -->
+
+        <section class="services-statistics">
+
+
+            <!-- TOTAL SERVICES -->
+
+            <div class="service-stat-card">
+
+                <div class="service-stat-icon">
+                    🛠️
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Services
+                    </span>
+
+                    <strong>
+                        {{ services|length }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- BOOKINGS -->
+
+            <div class="service-stat-card">
+
+                <div class="service-stat-icon">
+                    📅
+                </div>
+
+                <div>
+
+                    <span>
+                        Bookings
+                    </span>
+
+                    <strong>
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- REVENUE -->
+
+            <div class="service-stat-card">
+
+                <div class="service-stat-icon">
+                    💰
+                </div>
+
+                <div>
+
+                    <span>
+                        Service Revenue
+                    </span>
+
+                    <strong>
+                        KSh 0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================
+             SERVICES SECTION
+        ================================== -->
+
+        <section class="services-list-section">
+
+
+            <div class="services-list-header">
+
+                <div>
+
+                    <span class="services-section-label">
+                        SERVICE MANAGEMENT
+                    </span>
+
+                    <h2>
+                        Your Services
+                    </h2>
+
+                    <p>
+                        View and manage the services
+                        offered by your business.
+                    </p>
+
+                </div>
+
+
+                {% if services %}
+
+                    <span class="services-count">
+                        {{ services|length }}
+                        {% if services|length == 1 %}
+                            Service
+                        {% else %}
+                            Services
+                        {% endif %}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+
+            {% if services %}
+
+
+                <!-- =================================
+                     SERVICE TABLE
+                ================================== -->
+
+                <div class="services-table-wrapper">
+
+                    <table class="services-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Service
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Cost
+                                </th>
+
+                                <th>
+                                    Customer Price
+                                </th>
+
+                                <th>
+                                    Duration
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for service in services %}
+
+
+                                <tr>
+
+
+                                    <!-- SERVICE -->
+
+                                    <td>
+
+                                        <div class="service-name-cell">
+
+                                            <div class="service-list-icon">
+                                                ⚙
+                                            </div>
+
+
+                                            <div>
+
+                                                <strong>
+                                                    {{ service.name }}
+                                                </strong>
+
+
+                                                {% if service.description %}
+
+                                                    <small>
+                                                        {{ service.description }}
+                                                    </small>
+
+                                                {% else %}
+
+                                                    <small>
+                                                        No description
+                                                    </small>
+
+                                                {% endif %}
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+
+                                    <!-- CATEGORY -->
+
+                                    <td>
+
+                                        <span class="service-category">
+
+                                            {{ service.category or
+                                            "Uncategorized" }}
+
+                                        </span>
+
+                                    </td>
+
+
+
+                                    <!-- COST -->
+
+                                    <td>
+
+                                        <span class="service-price-secondary">
+
+                                            KSh
+                                            {{ "%.2f"|format(
+                                                service.cost
+                                            ) }}
+
+                                        </span>
+
+                                    </td>
+
+
+
+                                    <!-- CUSTOMER PRICE -->
+
+                                    <td>
+
+                                        <strong class="service-price">
+
+                                            KSh
+                                            {{ "%.2f"|format(
+                                                service.selling_price
+                                            ) }}
+
+                                        </strong>
+
+                                    </td>
+
+
+
+                                    <!-- DURATION -->
+
+                                    <td>
+
+                                        <span class="service-duration">
+
+                                            ⏱
+                                            {{ service.duration or
+                                            "Not specified" }}
+
+                                        </span>
+
+                                    </td>
+
+
+
+                                    <!-- STATUS -->
+
+                                    <td>
+
+                                        {% if service.available %}
+
+                                            <span class="service-availability available">
+
+                                                <span class="service-status-dot">
+                                                </span>
+
+                                                Available
+
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="service-availability unavailable">
+
+                                                <span class="service-status-dot">
+                                                </span>
+
+                                                Unavailable
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+
+                                    <!-- ACTION -->
+
+                                    <td>
+
+                                        <a
+                                            href="{{ url_for(
+                                                'view_service',
+                                                business_id=business._id,
+                                                service_id=service._id
+                                            ) }}"
+                                            class="service-view-button"
+                                        >
+                                            View Service
+                                        </a>
+
+                                    </td>
+
+
+                                </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+
+                <!-- =================================
+                     EMPTY STATE
+                ================================== -->
+
+                <div class="services-empty-state">
+
+                    <div class="services-empty-icon">
+                        🛠️
+                    </div>
+
+
+                    <span class="services-section-label">
+                        SERVICE MANAGEMENT
+                    </span>
+
+
+                    <h3>
+                        No Services Yet
+                    </h3>
+
+
+                    <p>
+                        Add your first service to start
+                        managing your services,
+                        customers and future bookings.
+                    </p>
+
+
+                    <a
+                        href="{{ url_for(
+                            'add_service',
+                            business_id=business._id
+                        ) }}"
+                        class="services-primary-button"
+                    >
+                        + Add Your First Service
+                    </a>
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+    </div>
+
+</main>
+
+
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
+<footer class="services-footer">
+
+    <img
+        src="{{ url_for(
+            'static',
+            filename='images/bizflow-logo.png'
+        ) }}"
+        alt="BIZFLOW"
+        class="footer-logo"
+    >
+
+    <p>
+        © 2026 BIZFLOW. All rights reserved.
+    </p>
+
+    <p class="footer-tagline">
+        Manage • Track • Grow
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>

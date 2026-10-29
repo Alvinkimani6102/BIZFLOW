@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restock {{ product.name }} | BIZFLOW</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .restock-container {
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(20, 35, 60, 0.08);
+        }
+        .restock-container h1 { margin-bottom: 8px; }
+        .restock-muted { color: #64748b; margin-bottom: 24px; }
+        .restock-stock {
+            padding: 16px;
+            margin-bottom: 24px;
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .restock-form label {
+            display: block;
+            margin: 16px 0 7px;
+            font-weight: 600;
+        }
+        .restock-form input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+        .restock-button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 13px;
+            border: 0;
+            border-radius: 8px;
+            background: #1d4ed8;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .restock-button:hover { background: #1e40af; }
+        .restock-error {
+            padding: 12px;
+            background: #fef2f2;
+            color: #b91c1c;
+            border-radius: 8px;
+        }
+        .restock-back {
+            display: inline-block;
+            margin-top: 18px;
+            color: #1d4ed8;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <main class="restock-container">
+        <h1>Restock Product</h1>
+        <p class="restock-muted">
+            {{ business.name }} · Add newly received stock.
+        </p>
+
+        <div class="restock-stock">
+            <strong>{{ product.name }}</strong><br>
+            Current stock:
+            <strong>{{ product.quantity | default(0, true) }}</strong>
+            {{ product.measurement_type | default("units", true) }}
+        </div>
+
+        {% if error %}
+            <p class="restock-error">{{ error }}</p>
+        {% endif %}
+
+        <form class="restock-form" method="POST">
+            <label for="quantity">Quantity received</label>
+            <input id="quantity" name="quantity" type="number"
+                   min="0.000001" step="any" required>
+
+            <label for="buying_price">Buying price per unit (KSh)</label>
+            <input id="buying_price" name="buying_price" type="number"
+                   min="0" step="0.01"
+                   value="{{ product.buying_price | default(0, true) }}"
+                   required>
+
+            <label for="supplier">Supplier (optional)</label>
+            <input id="supplier" name="supplier" type="text"
+                   maxlength="150" placeholder="Supplier name">
+
+            <label for="purchase_date">Purchase date</label>
+            <input id="purchase_date" name="purchase_date"
+                   type="date" value="{{ '' }}" >
+
+            <button class="restock-button" type="submit">
+                Confirm Restock
+            </button>
+        </form>
+
+        <a class="restock-back"
+           href="{{ url_for('view_product',
+                            business_id=business._id,
+                            product_id=product._id) }}">
+            ← Back to product
+        </a>
+    </main>
+</body>
+</html>

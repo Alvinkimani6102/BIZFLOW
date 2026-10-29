@@ -1,0 +1,713 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Loans & Repayments | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="{% if session.get('role') == 'worker' %}{{ url_for('business_workspace', business_id=business._id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="brand">
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW Logo"
+    >
+</a>
+
+    <nav>
+        <a href="{{ url_for('business_workspace', business_id=business._id) }}">
+            Business
+        </a>
+
+        <a href="{{ url_for('sales_history', business_id=business._id) }}">
+            Sales
+        </a>
+
+        <a href="/logout" class="signup-button">Logout</a>
+    </nav>
+</header>
+
+<div class="loans-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Loan Management</h1>
+            <p>Track customer credit sales and repayments.</p>
+        </div>
+
+        <a
+            href="{{ url_for('business_workspace', business_id=business._id) }}"
+            class="back-btn"
+        >
+            Back to Business
+        </a>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <span>Total Loan Value</span>
+            <h2>KSh {{ "{:,.2f}".format(total_loan_value) }}</h2>
+        </div>
+
+        <div class="summary-card">
+            <span>Total Repaid</span>
+            <h2>KSh {{ "{:,.2f}".format(total_paid) }}</h2>
+        </div>
+
+        <div class="summary-card outstanding">
+            <span>Outstanding Balance</span>
+            <h2>KSh {{ "{:,.2f}".format(total_outstanding) }}</h2>
+        </div>
+    </div>
+
+    <div class="loans-card">
+        <div class="section-heading">
+            <div>
+                <h2>Customer Loans</h2>
+                <p>View debts and record customer payments.</p>
+            </div>
+
+            <span class="loan-count">
+               {{ loans|length }} customer(s)
+            </span>
+        </div>
+
+                <!-- LOAN SEARCH AND DATE FILTERS -->
+        <div class="loan-filters">
+
+            <div class="loan-filter-field loan-search-field">
+                <label for="loanSearch">Search customer</label>
+                <input
+                    type="search"
+                    id="loanSearch"
+                    placeholder="Enter customer name..."
+                >
+            </div>
+
+            <div class="loan-filter-field">
+                <label for="loanSort">Sort by loan date</label>
+                <select id="loanSort">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="name">Customer name (A–Z)</option>
+                </select>
+            </div>
+
+            <div class="loan-filter-field">
+                <label for="loanStartDate">From date</label>
+                <input type="date" id="loanStartDate">
+            </div>
+
+            <div class="loan-filter-field">
+                <label for="loanEndDate">To date</label>
+                <input type="date" id="loanEndDate">
+            </div>
+
+            <button type="button" id="resetLoanFilters" class="reset-loan-filters">
+                Reset filters
+            </button>
+
+        </div>
+
+        <p id="loanFilterMessage" class="loan-filter-message"></p>
+
+        {% if loans %}
+        <div class="table-wrapper">
+            <table class="loans-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Reference</th>
+                        <th>Loan Amount</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                        <th>Receipt</th>
+                        <th>Record Repayment</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+    {% for customer in loans %}
+        <tr
+        class="loan-customer-row"
+        data-customer="{{ customer.customer_name|lower }}"
+        data-dates="{% for loan in customer.loans %}{% if loan.get('created_at') %}{{ loan.get('created_at').strftime('%Y-%m-%d') }}{% if not loop.last %},{% endif %}{% endif %}{% endfor %}"
+    >
+        <td>
+            <strong>{{ customer.customer_name }}</strong>
+            <br>
+            <small>{{ customer.loans|length }} credit sale(s)</small>
+        </td>
+
+        <td>
+            {% for loan in customer.loans %}
+                <div style="margin-bottom: 8px;">
+                    <strong>{{ loan.get("reference", "N/A") }}</strong>
+                    <br>
+                    <small>
+                        {% if loan.get("created_at") %}
+                            {{ loan.get("created_at").strftime("%d %b %Y") }}
+                        {% else %}
+                            Date unavailable
+                        {% endif %}
+                    </small>
+                    <br>
+                    <a
+                        class="view-receipt-btn"
+                        href="{{ url_for(
+                            'sale_receipt',
+                            business_id=business._id,
+                            reference=loan.get('reference')
+                        ) }}"
+                    >
+                        View Receipt
+                    </a>
+                </div>
+            {% endfor %}
+        </td>
+
+        <td>
+            KSh {{ "{:,.2f}".format(customer.total_loan_value) }}
+        </td>
+
+        <td class="paid-amount">
+            KSh {{ "{:,.2f}".format(customer.total_paid) }}
+        </td>
+
+        <td class="balance-amount">
+            KSh {{ "{:,.2f}".format(customer.total_outstanding) }}
+        </td>
+
+        <td>
+            {% if customer.total_outstanding <= 0 %}
+                <span class="status-badge status-paid">Paid</span>
+            {% elif customer.total_paid > 0 %}
+                <span class="status-badge status-partial">Partial</span>
+            {% else %}
+                <span class="status-badge status-unpaid">Unpaid</span>
+            {% endif %}
+        </td>
+
+        <td>
+            {% if customer.total_outstanding > 0 %}
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'record_loan_repayment',
+                        business_id=business._id,
+                        reference=customer.repayment_reference
+                    ) }}"
+                    class="repayment-form"
+                >
+                    <input
+                        type="number"
+                        name="amount"
+                        min="0.01"
+                        max="{{ '%.2f'|format(customer.total_outstanding) }}"
+                        step="0.01"
+                        placeholder="Amount (KSh)"
+                        required
+                    >
+
+                    <select name="payment_method" required>
+                        <option value="">Payment method</option>
+                        <option value="Cash">Cash</option>
+                        <option value="M-Pesa">M-Pesa</option>
+                        <option value="Card">Card</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <button type="submit" class="repay-btn">
+                        Record Payment
+                    </button>
+                </form>
+            {% else %}
+                <span class="fully-paid">Fully paid</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="7">
+            No customer loans yet.
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+            </table>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">₭</div>
+            <h3>No customer loans yet</h3>
+            <p>When you record a product sale as a loan, it will appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.loans-page {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    color: #172033;
+}
+
+.page-header,
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+    font-weight: 750;
+}
+
+.page-header p,
+.section-heading p {
+    margin: 0;
+    color: #718096;
+}
+
+.back-btn {
+    text-decoration: none;
+    padding: 11px 17px;
+    border: 1px solid #dce3ed;
+    border-radius: 9px;
+    color: #26354d;
+    font-weight: 600;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.summary-card,
+.loans-card {
+    background: #fff;
+    border: 1px solid #e6ebf2;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(20, 35, 60, 0.04);
+}
+
+.summary-card {
+    padding: 23px;
+}
+
+.summary-card span {
+    color: #718096;
+    font-size: 14px;
+}
+
+.summary-card h2 {
+    margin: 12px 0 0;
+    font-size: 25px;
+    overflow-wrap: anywhere;
+}
+
+.summary-card.outstanding h2,
+.balance-amount {
+    color: #c24135;
+    font-weight: 700;
+}
+
+.loans-card {
+    padding: 24px;
+}
+.loan-filters {
+    display: grid;
+    grid-template-columns: minmax(200px, 2fr) repeat(3, minmax(130px, 1fr)) auto;
+    gap: 14px;
+    align-items: end;
+    margin-bottom: 18px;
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px solid #e6ebf2;
+    border-radius: 12px;
+}
+
+.loan-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.loan-filter-field label {
+    color: #475569;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.loan-filter-field input,
+.loan-filter-field select {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 11px;
+    border: 1px solid #d9e0e9;
+    border-radius: 8px;
+    background: #fff;
+    color: #172033;
+    font: inherit;
+}
+
+.reset-loan-filters {
+    padding: 11px 14px;
+    border: 1px solid #d9e0e9;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.reset-loan-filters:hover {
+    background: #eef2ff;
+}
+
+.loan-filter-message {
+    margin: 0 0 12px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+@media (max-width: 950px) {
+    .loan-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .loan-search-field {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 520px) {
+    .loan-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .loan-search-field {
+        grid-column: auto;
+    }
+}
+
+.section-heading {
+    margin-bottom: 22px;
+}
+
+.section-heading h2 {
+    margin: 0 0 7px;
+    font-size: 21px;
+}
+
+.loan-count {
+    background: #eef2ff;
+    color: #4338ca;
+    border-radius: 20px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.loans-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.loans-table th,
+.loans-table td {
+    text-align: left;
+    padding: 16px 12px;
+    border-bottom: 1px solid #edf0f5;
+    vertical-align: top;
+}
+
+.loans-table th {
+    color: #64748b;
+    background: #f8fafc;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.loans-table td {
+    font-size: 13px;
+}
+
+.paid-amount {
+    color: #16805d;
+    font-weight: 650;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status-paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-partial {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-unpaid {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.repayment-form {
+    display: grid;
+    gap: 8px;
+    min-width: 175px;
+}
+
+.repayment-form input,
+.repayment-form select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px;
+    border: 1px solid #d9e0e9;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.repay-btn {
+    border: none;
+    border-radius: 7px;
+    padding: 10px;
+    background: #176b52;
+    color: #fff;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.repay-btn:hover {
+    background: #11553f;
+}
+
+.fully-paid {
+    color: #16805d;
+    font-weight: 650;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 55px 20px;
+}
+
+.empty-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 27px;
+    margin-bottom: 12px;
+}
+
+.empty-state h3 {
+    margin: 0 0 8px;
+}
+
+.empty-state p {
+    color: #718096;
+}
+
+@media (max-width: 800px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .loans-page {
+        padding: 22px 12px;
+    }
+
+    .loans-card {
+        padding: 15px;
+    }
+
+    .page-header h1 {
+        font-size: 25px;
+    }
+
+  
+    .receipt-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 110px;
+}
+
+.view-receipt-btn {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    padding: 9px 12px;
+    border-radius: 7px;
+    background: #e8efff;
+    color: #2448a5;
+    font-weight: 650;
+    font-size: 12px;
+}
+
+.view-receipt-btn:hover {
+    background: #d6e3ff;
+}
+}
+</style>
+
+<footer>
+    <img src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+         alt="BIZFLOW" class="footer-logo">
+
+    <p>© 2026 BIZFLOW. All rights reserved.</p>
+    <p class="footer-tagline">Manage • Track • Grow</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("loanSearch");
+    const sortSelect = document.getElementById("loanSort");
+    const startDateInput = document.getElementById("loanStartDate");
+    const endDateInput = document.getElementById("loanEndDate");
+    const resetButton = document.getElementById("resetLoanFilters");
+    const message = document.getElementById("loanFilterMessage");
+    const tableBody = document.querySelector(".loans-table tbody");
+
+    if (!tableBody) return;
+
+    const rows = Array.from(
+        tableBody.querySelectorAll(".loan-customer-row")
+    );
+
+    function getDates(row) {
+        return (row.dataset.dates || "")
+            .split(",")
+            .filter(Boolean)
+            .sort();
+    }
+
+    function applyLoanFilters() {
+        const search = searchInput.value.trim().toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortBy = sortSelect.value;
+
+        if (startDate && endDate && startDate > endDate) {
+            message.textContent = "The start date must not be after the end date.";
+            rows.forEach(row => row.style.display = "none");
+            return;
+        }
+
+        message.textContent = "";
+
+        const matchingRows = [];
+
+        rows.forEach(row => {
+            const customerName = row.dataset.customer || "";
+            const dates = getDates(row);
+
+            const matchesName = customerName.includes(search);
+
+            const matchesDate = dates.some(date => {
+                return (!startDate || date >= startDate) &&
+                       (!endDate || date <= endDate);
+            });
+
+            const hasDateFilter = Boolean(startDate || endDate);
+            const matches = matchesName &&
+                (!hasDateFilter || matchesDate);
+
+            row.style.display = matches ? "" : "none";
+
+            if (matches) {
+                matchingRows.push(row);
+            }
+        });
+
+        matchingRows.sort((a, b) => {
+            const datesA = getDates(a);
+            const datesB = getDates(b);
+            const latestA = datesA.length ? datesA[datesA.length - 1] : "";
+            const latestB = datesB.length ? datesB[datesB.length - 1] : "";
+
+            if (sortBy === "name") {
+                return (a.dataset.customer || "").localeCompare(
+                    b.dataset.customer || ""
+                );
+            }
+
+            if (sortBy === "oldest") {
+                return (datesA[0] || "9999-12-31").localeCompare(
+                    datesB[0] || "9999-12-31"
+                );
+            }
+
+            return latestB.localeCompare(latestA);
+        });
+
+        matchingRows.forEach(row => tableBody.appendChild(row));
+
+        message.textContent =
+            `Showing ${matchingRows.length} of ${rows.length} customer(s).`;
+    }
+
+    searchInput.addEventListener("input", applyLoanFilters);
+    sortSelect.addEventListener("change", applyLoanFilters);
+    startDateInput.addEventListener("change", applyLoanFilters);
+    endDateInput.addEventListener("change", applyLoanFilters);
+
+    resetButton.addEventListener("click", function () {
+        searchInput.value = "";
+        sortSelect.value = "newest";
+        startDateInput.value = "";
+        endDateInput.value = "";
+        applyLoanFilters();
+    });
+
+    applyLoanFilters();
+});
+</script>
+
+</body>
+</html>
+

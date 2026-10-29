@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+
+        <a href="/" class="brand">
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW Logo"
+            >
+        </a>
+
+        <nav>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout" class="signup-button">Logout</a>
+        </nav>
+
+    </header>
+
+
+    
+    <!-- ACTIVE PLATFORM ANNOUNCEMENTS -->
+    {% if announcements %}
+        <section class="platform-announcements" aria-label="BIZFLOW announcements">
+            <div class="announcement-heading">
+                <span class="announcement-icon" aria-hidden="true">📢</span>
+                <div>
+                    <h2>What's New at BIZFLOW</h2>
+                    <p>Important announcements from the BIZFLOW team</p>
+                </div>
+            </div>
+
+            <div class="announcement-list">
+                {% for announcement in announcements %}
+                    <article class="user-announcement">
+                        <div class="user-announcement-content">
+                            <h3>{{ announcement.title }}</h3>
+                            <p>{{ announcement.message }}</p>
+
+                            {% if announcement.created_at %}
+                                <small>
+                                    {{ announcement.created_at.strftime('%d %b %Y, %H:%M') }}
+                                </small>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <!-- DASHBOARD -->
+
+    <main class="dashboard-page">
+
+        <div class="dashboard-container">
+
+            <div class="dashboard-header">
+
+                <div>
+                    <p class="dashboard-welcome">
+                        Welcome back,
+                    </p>
+
+                    <h1>
+                        {{ user_name }}
+                    </h1>
+
+                    <p class="dashboard-description">
+                        Manage your businesses from one place.
+                    </p>
+                </div>
+
+                <a href="/create-business" class="primary-button">
+                    + Create Business
+                </a>
+
+            </div>
+
+
+            <!-- BUSINESS SECTION -->
+            <section class="business-section">
+
+    <div class="section-header">
+
+        <div>
+            <h2>Your Businesses</h2>
+
+            <p class="business-description">
+                Manage your businesses from one place.
+            </p>
+        </div>
+
+        <a href="/create-business" class="primary-button">
+            + Add Business
+        </a>
+
+    </div>
+
+
+    {% if businesses %}
+
+        <div class="business-grid">
+
+            {% for business in businesses %}
+
+                <div class="business-card">
+
+                    <div class="business-card-icon">
+                        🏢
+                    </div>
+
+                    <div class="business-card-content">
+
+                        <h3>
+                            {{ business.name }}
+                        </h3>
+
+                        <span class="business-type">
+                            {{ business.type }}
+                        </span>
+
+                        {% if business.description %}
+
+                            <p>
+                                {{ business.description }}
+                            </p>
+
+                        {% else %}
+
+                            <p>
+                                No description provided.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                    <a href="{{ url_for('business_workspace', business_id=business._id) }}"
+   class="business-view-button">
+    Open Business →
+</a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty-business">
+
+            <div class="empty-icon">
+                🏢
+            </div>
+
+            <h3>
+                You don't have any businesses yet
+            </h3>
+
+            <p>
+                Create your first business and start
+                managing your products, services,
+                sales and expenses.
+            </p>
+
+            <a href="/create-business" class="primary-button">
+                Create Your First Business
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

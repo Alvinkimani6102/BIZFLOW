@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Order | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .edit-order-card {
+            max-width: 760px;
+            margin: 25px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .edit-order-card .form-group {
+            margin-bottom: 18px;
+        }
+
+        .edit-order-card label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .edit-order-card input,
+        .edit-order-card textarea,
+        .edit-order-card select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .edit-order-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 22px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a href="{{ url_for('business_workspace', business_id=business._id) }}"
+           class="brand">
+
+            <img src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                 alt="BIZFLOW Logo">
+
+        </a>
+
+        <nav>
+            <a href="{{ url_for('business_orders', business_id=business._id) }}">
+                Back to Orders
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="signup-button">
+                Logout
+            </a>
+        </nav>
+
+    </header>
+
+    <main class="workspace-page">
+
+        <div class="workspace-container">
+
+            <section class="workspace-header">
+                <div>
+                    <p class="workspace-label">ORDER MANAGEMENT</p>
+                    <h1>Edit Order</h1>
+
+                    <p class="workspace-description">
+                        Update order details for {{ business.name }}.
+                    </p>
+                </div>
+
+                <span class="workspace-type">Owner</span>
+            </section>
+
+            <section class="edit-order-card">
+
+                <h2>{{ order.customer_name }}</h2>
+
+                <p>
+                    <strong>Agreed Order Price:</strong>
+                    KSh {{ "%.2f"|format(order.agreed_total|float) }}
+                </p>
+
+                <p>
+                    <strong>Total Paid:</strong>
+                    KSh {{ "%.2f"|format(order.total_paid|float) }}
+                </p>
+
+                <p>
+                    <strong>Outstanding Balance:</strong>
+                    KSh {{ "%.2f"|format(order.balance|float) }}
+                </p>
+
+                <form method="POST"
+                      action="{{ url_for('edit_order', business_id=business._id, order_id=order._id) }}">
+
+                    <div class="form-group">
+                        <label for="customer_name">
+                            Customer or Institution
+                        </label>
+
+                        <input type="text"
+                               id="customer_name"
+                               name="customer_name"
+                               value="{{ order.customer_name }}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_contact">
+                            Customer Contact
+                        </label>
+
+                        <input type="text"
+                               id="customer_contact"
+                               name="customer_contact"
+                               value="{{ order.customer_contact or '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="order_description">
+                            Order Description
+                        </label>
+
+                        <textarea id="order_description"
+                                  name="order_description"
+                                  rows="4">{{ order.order_description or '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="production_status">
+                            Production Status
+                        </label>
+
+                        <select id="production_status"
+                                name="production_status"
+                                required>
+
+                            <option value="Pending"
+                                {% if order.production_status == "Pending" %}selected{% endif %}>
+                                Pending
+                            </option>
+
+                            <option value="In Progress"
+                                {% if order.production_status == "In Progress" %}selected{% endif %}>
+                                In Progress
+                            </option>
+
+                            <option value="Completed"
+                                {% if order.production_status == "Completed" %}selected{% endif %}>
+                                Completed
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="delivery_status">
+                            Delivery Status
+                        </label>
+
+                        <select id="delivery_status"
+                                name="delivery_status"
+                                required>
+
+                            <option value="Not Delivered"
+                                {% if order.delivery_status == "Not Delivered" %}selected{% endif %}>
+                                Not Delivered
+                            </option>
+
+                            <option value="Partially Delivered"
+                                {% if order.delivery_status == "Partially Delivered" %}selected{% endif %}>
+                                Partially Delivered
+                            </option>
+
+                            <option value="Delivered"
+                                {% if order.delivery_status == "Delivered" %}selected{% endif %}>
+                                Delivered
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="edit-order-actions">
+
+                        <button type="submit" class="signup-button">
+                            Save Changes
+                        </button>
+
+                        <a href="{{ url_for('business_orders', business_id=business._id) }}"
+                           class="signup-button">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <footer>
+        <img src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+             alt="BIZFLOW"
+             class="footer-logo">
+
+        <p>© 2026 BIZFLOW. All rights reserved.</p>
+
+        <p class="footer-tagline">Manage • Track • Grow</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIZFLOW | Business Dashboard</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        .navbar {
+            background: #fff;
+            padding: 20px 6%;
+            border-bottom: 1px solid #e5eaf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1769e0;
+        }
+
+        .role { color: #526078; font-size: 14px; }
+
+        .container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .welcome { margin-bottom: 28px; }
+
+        .welcome h1 {
+            margin-bottom: 8px;
+            font-size: 30px;
+        }
+
+        .welcome p, .business-card p {
+            color: #65728a;
+            line-height: 1.6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .card, .business-card, .module {
+            background: #fff;
+            border: 1px solid #e6ebf3;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 5px 18px rgba(20, 40, 80, .04);
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 15px;
+            color: #65728a;
+        }
+
+        .value {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .section-heading { margin: 30px 0 16px; }
+
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .module h3 { margin: 0 0 10px; }
+
+        .module p {
+            color: #65728a;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .module a {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: #1769e0;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .module a:hover { background: #1054b8; }
+
+        .notice {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #eef5ff;
+            color: #2456a6;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .navbar { padding: 18px 5%; }
+            .container { margin-top: 25px; }
+            .welcome h1 { font-size: 25px; }
+            .role { font-size: 12px; }
+        }
+
+        
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.logout-btn {
+    display: inline-block;
+    padding: 11px 18px;
+    background: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 9px;
+    transition: background 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: #b02a37;
+}
+
+@media (max-width: 600px) {
+    .nav-actions {
+        gap: 10px;
+    }
+
+    .logout-btn {
+        padding: 9px 12px;
+        font-size: 13px;
+    }
+
+    .role {
+        font-size: 12px;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+    
+<header class="navbar">
+    <div class="brand">BIZFLOW</div>
+
+    <div class="nav-actions">
+        <div class="role">Worker Account</div>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            Log Out
+        </a>
+    </div>
+</header>
+
+
+    <main class="container">
+        <section class="welcome">
+            <h1>Welcome, {{ worker_name }}</h1>
+            <p>
+                Your workspace for <strong>{{ business.name }}</strong>.
+                Manage your business activities from one place.
+            </p>
+        </section>
+
+        <section class="stats">
+            <div class="card">
+                <h3>Today's Completed Sales</h3>
+                <div class="value">{{ today_sales_count }}</div>
+            </div>
+
+            <div class="card">
+                <h3>Today's Paid Revenue</h3>
+                <div class="value">
+                    KSh {{ "{:,.2f}".format(today_revenue) }}
+                </div>
+            </div>
+        </section>
+
+        <h2 class="section-heading">{{ business.name }} Workspace</h2>
+
+        <section class="modules">
+            <div class="module">
+                <h3>Products & Services</h3>
+                <p>View the products and services offered by this business.</p>
+                <a href="{{ url_for('products', business_id=business._id) }}">
+                    Open Products
+                </a>
+            </div>
+
+            <div class="module">
+                <h3>Make a Sale</h3>
+                <p>Record a customer purchase and process a sale.</p>
+                <a href="{{ url_for('sell_products', business_id=business._id) }}">
+                    Open Sales
+                </a>
+            </div>
+
+            <div class="module">
+                <h3>Business Workspace</h3>
+                <p>Open the main workspace for your assigned business.</p>
+                <a href="{{ url_for('business_workspace', business_id=business._id) }}">
+                    Open Workspace
+                </a>
+            </div>
+        </section>
+
+        <section class="business-card" style="margin-top: 24px;">
+            <h2>{{ business.name }}</h2>
+            <p>
+                {{ business.description or
+                   "Welcome to your assigned business workspace." }}
+            </p>
+
+            <div class="notice">
+                You are using your assigned business account.
+                Confidential owner financial information remains protected.
+            </div>
+        </section>
+    </main>
+</body>
+</html>

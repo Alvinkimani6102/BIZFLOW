@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Edit Product | {{ product.name }} | BIZFLOW
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static',
+                           filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a href="/dashboard" class="brand">
+
+        <img
+            src="{{ url_for('static',
+                            filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW Logo"
+        >
+
+    </a>
+
+    <nav>
+
+        <a href="{{ url_for('products',
+                            business_id=business._id) }}">
+            Products
+        </a>
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/logout"
+           class="signup-button">
+            Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="signup-page">
+
+    <div class="signup-container">
+
+        <p class="workspace-label">
+            {{ business.name }}
+        </p>
+
+        <h1>
+            Edit Product
+        </h1>
+
+        <p class="signup-description">
+            Update the information for
+            {{ product.name }}.
+        </p>
+
+
+        <form
+            action="{{ url_for('edit_product',
+                               business_id=business._id,
+                               product_id=product._id) }}"
+            method="POST"
+        >
+
+            <div class="form-group">
+
+                <label for="name">
+                    Product Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ product.name }}"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <input
+                    type="text"
+                    id="category"
+                    name="category"
+                    value="{{ product.category }}"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                >{{ product.description }}</textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="buying_price">
+                    Buying Price
+                </label>
+
+                <input
+                    type="number"
+                    id="buying_price"
+                    name="buying_price"
+                    value="{{ product.buying_price }}"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="selling_price">
+                    Selling Price
+                </label>
+
+                <input
+                    type="number"
+                    id="selling_price"
+                    name="selling_price"
+                    value="{{ product.selling_price }}"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="quantity">
+                    Current Quantity
+                </label>
+
+                <input
+                    type="number"
+                    id="quantity"
+                    name="quantity"
+                    value="{{ product.quantity }}"
+                    min="0"
+                    step="1"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="low_stock_threshold">
+                    Low Stock Alert Level
+                </label>
+
+                <input
+                    type="number"
+                    id="low_stock_threshold"
+                    name="low_stock_threshold"
+                    value="{{ product.low_stock_threshold }}"
+                    min="0"
+                    step="1"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="signup-submit"
+            >
+                Save Changes
+            </button>
+
+        </form>
+
+
+        <p class="login-text">
+
+            <a href="{{ url_for('view_product',
+                                business_id=business._id,
+                                product_id=product._id) }}">
+
+                ← Cancel
+
+            </a>
+
+        </p>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <img
+        src="{{ url_for('static',
+                        filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW"
+        class="footer-logo"
+    >
+
+    <p>
+        © 2026 BIZFLOW. All rights reserved.
+    </p>
+
+    <p class="footer-tagline">
+        Manage • Track • Grow
+    </p>
+
+</footer>
+
+</body>
+
+</html>

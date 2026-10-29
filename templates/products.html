@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Products | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a href="{% if session.get('role') == 'worker' %}{{ url_for('business_workspace', business_id=business._id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="brand">
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW Logo"
+    >
+</a>
+
+        <nav>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('business_workspace',
+                                business_id=business._id) }}">
+                Business
+            </a>
+
+            <a href="/logout" class="signup-button">
+                Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <main class="products-page">
+
+        <div class="products-container">
+
+            <!-- Products Header -->
+
+<div class="products-header">
+
+    <div>
+
+        <p class="workspace-label">
+            {{ business.name }}
+        </p>
+
+        <h1>
+            Products
+        </h1>
+
+        <p>
+            Create, manage, sell and analyze your products.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- Product Management Tabs -->
+
+<section class="product-tabs">
+
+    {% if session.get("role") != "worker" %}
+
+   <a href="{{ url_for('create_product',
+                    business_id=business._id) }}"
+   class="product-tab">
+
+        <div class="product-tab-icon">
+            ➕
+        </div>
+
+        <div>
+
+            <h3>
+                Create Product
+            </h3>
+
+            <p>
+                Create categories, products,
+                pricing and stock.
+            </p>
+
+        </div>
+
+    </a>
+    {% endif %}
+
+
+    <a href="{{ url_for('sell_products', business_id=business._id) }}"
+   class="product-tab">
+
+        <div class="product-tab-icon">
+            🛒
+        </div>
+
+        <div>
+
+            <h3>
+                Sell Product
+            </h3>
+
+            <p>
+                Search products, make sales,
+                track profit and analyze performance.
+            </p>
+
+        </div>
+
+    </a>
+
+</section>
+
+
+          
+
+        </div>
+
+    </main>
+
+
+    <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

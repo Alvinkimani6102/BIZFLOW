@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Sales | BIZFLOW Admin</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .admin-sales {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+        .sales-heading {
+            margin-bottom: 24px;
+        }
+        .sales-heading h1 {
+            margin-bottom: 8px;
+        }
+        .sales-table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+        .sales-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+        .sales-table th,
+        .sales-table td {
+            padding: 13px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .sales-table th {
+            background: #f8fafc;
+            color: #475569;
+        }
+        .sales-table tr:last-child td {
+            border-bottom: none;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            font-size: 12px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+        }
+        .empty-sales {
+            padding: 25px;
+            text-align: center;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <main class="admin-sales">
+        <a class="back-link"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+
+        <div class="sales-heading">
+            <h1>Sales History</h1>
+            <p>
+                Business:
+                <strong>{{ business.get('name', 'Unnamed business') }}</strong>
+            </p>
+            <p>Showing up to 200 most recent sales.</p>
+        </div>
+
+        <div class="sales-table-wrapper">
+            {% if sales %}
+            <table class="sales-table">
+                <thead>
+                    <tr>
+                        <th>Receipt Reference</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Sale Type</th>
+                        <th>Total</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
+                        <th>Payment Status</th>
+                        <th>Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td>
+    {% if sale.get('reference') %}
+        <a href="{{ url_for(
+            'admin_sale_receipt',
+            business_id=business['_id'],
+            reference=sale['reference']
+        ) }}">
+            {{ sale['reference'] }}
+        </a>
+    {% else %}
+        N/A
+    {% endif %}
+</td>
+                        <td>
+                            {% if sale.get('created_at') %}
+                                {{ sale['created_at'].strftime('%d %b %Y %H:%M') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ sale.get('customer_name') or 'Walk-in customer' }}</td>
+                        <td>{{ sale.get('sale_type', 'paid')|title }}</td>
+                        <td>KSh {{ "%.2f"|format(sale.get('total', 0)|float) }}</td>
+                        <td>KSh {{ "%.2f"|format(sale.get('amount_paid', 0)|float) }}</td>
+                        <td>KSh {{ "%.2f"|format(sale.get('balance', 0)|float) }}</td>
+                        <td>
+                            <span class="status">
+                                {{ sale.get('payment_status', 'Unknown') }}
+                            </span>
+                        </td>
+                        <td>{{ sale.get('payment_method', 'N/A') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-sales">
+                No sales records were found for this business.
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

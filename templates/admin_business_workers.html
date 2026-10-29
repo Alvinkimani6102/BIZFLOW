@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Business Workers | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .admin-workers-container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .admin-workers-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .admin-workers-header h1 {
+            margin: 0 0 8px;
+            color: #0f172a;
+        }
+
+        .admin-workers-header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .admin-workers-button {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #1d4ed8;
+            color: white;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .admin-workers-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .admin-workers-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .admin-workers-table {
+            width: 100%;
+            min-width: 650px;
+            border-collapse: collapse;
+        }
+
+        .admin-workers-table th,
+        .admin-workers-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .admin-workers-table th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .admin-workers-count {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 6px 10px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .admin-workers-role {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 12px;
+            text-transform: capitalize;
+        }
+
+        .admin-workers-empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .admin-workers-container {
+                margin: 15px auto;
+                padding: 12px;
+            }
+
+            .admin-workers-card {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="brand">
+        <a href="{{ url_for('admin_panel') }}"
+           style="text-decoration:none;color:inherit;">
+            BIZFLOW
+        </a>
+    </div>
+</header>
+
+<main class="admin-workers-container">
+
+    <div class="admin-workers-header">
+        <div>
+            <h1>Business Workers</h1>
+            <p>Business: <strong>{{ business.name }}</strong></p>
+            <p style="margin-top:6px;">
+                Administrator view — records are read-only.
+            </p>
+        </div>
+
+        <a class="admin-workers-button"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+    </div>
+
+    <section class="admin-workers-card">
+
+        <span class="admin-workers-count">
+            Active workers: {{ workers_list|length }}
+        </span>
+
+        {% if workers_list %}
+
+        <div class="admin-workers-table-wrapper">
+            <table class="admin-workers-table">
+                <thead>
+                    <tr>
+                        <th>Worker Name</th>
+                        <th>Email Address</th>
+                        <th>Assigned Role</th>
+                        <th>Membership Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for worker in workers_list %}
+                    <tr>
+                        <td>
+                            <strong>
+                                {{ worker.get('worker_name', 'Unknown worker') }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ worker.get('worker_email', '—') }}
+                        </td>
+
+                        <td>
+                            <span class="admin-workers-role">
+                                {{ worker.get('role', 'worker') }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ worker.get('status', 'active') }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+
+        <div class="admin-workers-empty">
+            <h3>No active workers found</h3>
+            <p>This business has no matching active worker memberships.</p>
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+</body>
+</html>

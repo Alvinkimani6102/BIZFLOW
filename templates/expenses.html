@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses | BIZFLOW</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .expense-page{max-width:1200px;margin:35px auto;padding:20px}
+        .expense-header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:25px}
+        .expense-header h1{margin:0;color:#172554}
+        .expense-header p{color:#64748b;margin:7px 0}
+        .expense-btn{display:inline-block;padding:11px 17px;border-radius:9px;background:#2563eb;color:#fff;text-decoration:none;border:none;cursor:pointer;font-weight:600}
+        .expense-btn:hover{background:#1d4ed8}
+        .expense-btn.secondary{background:#e2e8f0;color:#1e293b}
+        .expense-summary{background:linear-gradient(135deg,#172554,#2563eb);color:white;padding:25px;border-radius:16px;margin-bottom:25px;box-shadow:0 8px 25px #0f172a12}
+        .expense-summary p{margin:0 0 10px;opacity:.85}
+        .expense-summary h2{font-size:32px;margin:0}
+        .expense-panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin-bottom:22px}
+        .expense-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;align-items:end}
+        .expense-filters label,.expense-form label{display:block;font-weight:600;color:#334155;margin-bottom:7px}
+        .expense-filters input,.expense-filters select,.expense-form input,.expense-form select,.expense-form textarea{width:100%;box-sizing:border-box;padding:11px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font:inherit}
+        .expense-table-wrap{overflow-x:auto}
+        .expense-table{width:100%;border-collapse:collapse;min-width:750px}
+        .expense-table th,.expense-table td{padding:14px 12px;text-align:left;border-bottom:1px solid #e2e8f0}
+        .expense-table th{background:#f8fafc;color:#475569;font-size:13px}
+        .expense-table td{color:#334155}
+        .expense-name{font-weight:700;color:#0f172a}
+        .expense-muted{font-size:13px;color:#64748b;margin-top:4px}
+        .expense-actions{display:flex;gap:8px;align-items:center}
+        .expense-actions a{color:#2563eb;text-decoration:none;font-weight:600}
+        .expense-actions button{background:none;border:none;color:#dc2626;cursor:pointer;font-weight:600;font:inherit}
+        .expense-empty{text-align:center;padding:45px 15px;color:#64748b}
+        .expense-back{display:inline-block;margin-bottom:20px;color:#2563eb;text-decoration:none}
+        @media(max-width:600px){.expense-page{padding:12px;margin:15px auto}.expense-panel{padding:14px}.expense-summary h2{font-size:27px}}
+    </style>
+</head>
+<body>
+<div class="expense-page">
+    <a class="expense-back" href="{{ url_for('business_workspace', business_id=business._id) }}">← Back to Business Workspace</a>
+
+    <div class="expense-header">
+        <div>
+            <h1>Business Expenses</h1>
+            <p>Track and manage spending for {{ business.name }}.</p>
+        </div>
+        <a class="expense-btn" href="{{ url_for('add_expense', business_id=business._id) }}">+ Record Expense</a>
+    </div>
+
+    <div class="expense-summary">
+        <p>Total expenses for the selected results</p>
+        <h2>KSh {{ "{:,.2f}".format(total_expenses) }}</h2>
+    </div>
+
+    <div class="expense-panel">
+        <h3>Filter Expenses</h3>
+        <form method="GET" class="expense-filters">
+            <div>
+                <label for="category">Category</label>
+                <select name="category" id="category">
+                    <option value="">All categories</option>
+                    {% for item in categories %}
+                    <option value="{{ item }}" {% if selected_category == item %}selected{% endif %}>{{ item }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="start_date">From date</label>
+                <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+            </div>
+            <div>
+                <label for="end_date">To date</label>
+                <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+            </div>
+            <button class="expense-btn" type="submit">Apply Filters</button>
+            <a class="expense-btn secondary" href="{{ url_for('expenses', business_id=business._id) }}">Clear</a>
+        </form>
+    </div>
+
+    <div class="expense-panel">
+        <h3>Expense Records ({{ expenses|length }})</h3>
+        <div class="expense-table-wrap">
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>Expense</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Payment Method</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td>
+                            <div class="expense-name">{{ expense.name }}</div>
+                            {% if expense.description %}
+                            <div class="expense-muted">{{ expense.description }}</div>
+                            {% endif %}
+                        </td>
+                        <td>{{ expense.category }}</td>
+                        <td>{{ expense.expense_date }}</td>
+                        <td>{{ expense.payment_method or '—' }}</td>
+                        <td><strong>KSh {{ "{:,.2f}".format(expense.amount|float) }}</strong></td>
+                        <td>
+                            <div class="expense-actions">
+                                <a href="{{ url_for('edit_expense', business_id=business._id, expense_id=expense._id) }}">Edit</a>
+                                <form method="POST" action="{{ url_for('delete_expense', business_id=business._id, expense_id=expense._id) }}" onsubmit="return confirm('Delete this expense record?');">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="expense-empty">
+                                <h3>No expenses found</h3>
+                                <p>Record your first expense or change the selected filters.</p>
+                                <a class="expense-btn" href="{{ url_for('add_expense', business_id=business._id) }}">Record an Expense</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

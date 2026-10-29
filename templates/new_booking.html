@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>New Booking | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+
+        <a href="/dashboard" class="brand">
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW Logo"
+            >
+        </a>
+
+        <nav>
+
+            <a href="{{ url_for('business_workspace',
+                                business_id=business._id) }}">
+                Workspace
+            </a>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/logout" class="signup-button">
+                Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- NEW BOOKING PAGE -->
+
+    <main class="new-booking-page">
+
+        <div class="new-booking-container">
+
+
+            <!-- PAGE HEADER -->
+
+            <section class="new-booking-header">
+
+                <a
+                    href="#"
+                    class="booking-back-link"
+                >
+                    ← Back to Bookings
+                </a>
+
+                <p class="bookings-label">
+                    SERVICE MANAGEMENT
+                </p>
+
+                <h1>
+                    New Booking
+                </h1>
+
+                <p>
+                    Create a new customer appointment for
+                    {{ business.name }}.
+                </p>
+
+            </section>
+
+
+            <!-- BOOKING FORM -->
+
+            <form
+    class="booking-form"
+    method="POST"
+    action="{{ url_for('bookings', business_id=business._id) }}"
+>
+
+
+                <!-- CUSTOMER INFORMATION -->
+
+                <section class="booking-form-section">
+
+                    <div class="booking-form-section-header">
+
+                        <div class="booking-form-icon">
+                            👤
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Customer Information
+                            </h2>
+
+                            <p>
+                                Enter the customer's contact details.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="booking-form-grid">
+
+
+                        <!-- CUSTOMER -->
+
+                        <div class="booking-form-group">
+
+                            <label for="customer">
+                                Customer Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="customer"
+                                name="customer"
+                                placeholder="e.g. John Mwangi"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- CONTACT -->
+
+                        <div class="booking-form-group">
+
+                            <label for="contact">
+                                Contact
+                            </label>
+
+                            <input
+                                type="text"
+                                id="contact"
+                                name="contact"
+                                placeholder="e.g. 0712 345 678"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- SERVICE INFORMATION -->
+
+                <section class="booking-form-section">
+
+                    <div class="booking-form-section-header">
+
+                        <div class="booking-form-icon">
+                            🛠️
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Service Information
+                            </h2>
+
+                            <p>
+                                Select the service being booked.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="booking-form-grid">
+
+
+                        <!-- SERVICE -->
+
+                        
+
+                            
+<div class="form-group">
+    <label for="services">Select services</label>
+
+    <select
+        id="services"
+        name="services"
+        multiple
+        required
+        size="5"
+    >
+        {% for service in services %}
+            {% if service.available %}
+                <option
+                    value="{{ service._id }}"
+                    data-price="{{ service.selling_price }}"
+                >
+                    {{ service.name }} — KSh {{ "%.2f"|format(service.selling_price) }}
+                </option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <small>
+        Select multiple services. On a computer, hold Ctrl while clicking.
+    </small>
+
+    <div style="margin-top: 12px;">
+        <strong>Selected services total: KSh <span id="services-total">0.00</span></strong>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const select = document.getElementById("services");
+    const totalDisplay = document.getElementById("services-total");
+
+    function updateTotal() {
+        let total = 0;
+
+        Array.from(select.selectedOptions).forEach(function (option) {
+            total += Number(option.dataset.price || 0);
+        });
+
+        totalDisplay.textContent = total.toFixed(2);
+    }
+
+    select.addEventListener("change", updateTotal);
+    updateTotal();
+});
+</script>
+
+                        </div>
+
+
+                        <!-- DURATION -->
+
+                        <div class="booking-form-group">
+
+                            <label for="duration">
+                                Duration
+                            </label>
+
+                            <input
+                                type="text"
+                                id="duration"
+                                name="duration"
+                                placeholder="e.g. 1 hour"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- APPOINTMENT INFORMATION -->
+
+                <section class="booking-form-section">
+
+                    <div class="booking-form-section-header">
+
+                        <div class="booking-form-icon">
+                            📅
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Appointment Details
+                            </h2>
+
+                            <p>
+                                Set the date and time for the appointment.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="booking-form-grid">
+
+
+                        <!-- DATE -->
+
+                        <div class="booking-form-group">
+
+                            <label for="booking_date">
+                                Booking Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="booking_date"
+                                name="booking_date"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- TIME -->
+
+                        <div class="booking-form-group">
+
+                            <label for="appointment_time">
+                                Appointment Time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="appointment_time"
+                                name="appointment_time"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- STATUS -->
+
+                <section class="booking-form-section">
+
+                    <div class="booking-form-section-header">
+
+                        <div class="booking-form-icon">
+                            📌
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Booking Status
+                            </h2>
+
+                            <p>
+                                Set the current status of this appointment.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="booking-form-grid">
+
+
+                        <!-- STATUS -->
+
+                        <div class="booking-form-group">
+
+                            <label for="status">
+                                Status
+                            </label>
+
+                            <select
+                                id="status"
+                                name="status"
+                                required
+                            >
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                                <option value="Confirmed">
+                                    Confirmed
+                                </option>
+
+                                <option value="In Progress">
+                                    In Progress
+                                </option>
+
+                                <option value="Completed">
+                                    Completed
+                                </option>
+
+                                <option value="Cancelled">
+                                    Cancelled
+                                </option>
+
+                                <option value="No-show">
+                                    No-show
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- PAYMENT -->
+
+                <section class="booking-form-section">
+
+                    <div class="booking-form-section-header">
+
+                        <div class="booking-form-icon">
+                            💳
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Payment Information
+                            </h2>
+
+                            <p>
+                                Record the payment details for this booking.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="booking-form-grid">
+
+
+                        <!-- PAYMENT STATUS -->
+
+                        <div class="booking-form-group">
+
+                            <label for="payment_status">
+                                Payment Status
+                            </label>
+
+                            <select
+                                id="payment_status"
+                                name="payment_status"
+                                required
+                            >
+
+                              <option value="Unpaid">
+    Unpaid
+</option>
+
+<option value="Partial">
+    Partial
+</option>
+
+<option value="Paid">
+    Paid
+</option>
+
+<option value="Refunded">
+    Refunded
+</option>
+
+                            </select>
+
+                        </div>
+
+
+                       
+
+                      
+
+
+
+<!-- AMOUNT PAID -->
+
+<div class="booking-form-group">
+
+    <label for="amount_paid">
+        Amount Paid (KSh)
+    </label>
+
+    <input
+        type="number"
+        id="amount_paid"
+        name="amount_paid"
+        min="0"
+        step="0.01"
+        value="0"
+        placeholder="0.00"
+    >
+
+</div>
+
+
+                        <!-- PAYMENT METHOD -->
+
+                        <div class="booking-form-group">
+
+                            <label for="payment_method">
+                                Payment Method
+                            </label>
+
+                            <select
+                                id="payment_method"
+                                name="payment_method"
+                            >
+
+                                <option value="">
+                                    Select payment method
+                                </option>
+
+                                <option value="Cash">
+                                    Cash
+                                </option>
+
+                                <option value="M-Pesa">
+                                    M-Pesa
+                                </option>
+
+                                <option value="Card">
+                                    Card
+                                </option>
+
+                                <option value="Bank Transfer">
+                                    Bank Transfer
+                                </option>
+
+                                <option value="Other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- NOTES -->
+
+                <section class="booking-form-section">
+
+                    <div class="booking-form-section-header">
+
+                        <div class="booking-form-icon">
+                            📝
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Notes
+                            </h2>
+
+                            <p>
+                                Add any additional information about the booking.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="booking-form-group">
+
+                        <label for="notes">
+                            Booking Notes
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            name="notes"
+                            rows="5"
+                            placeholder="Enter any additional notes..."
+                        ></textarea>
+
+                    </div>
+
+                </section>
+
+
+                <!-- FORM ACTIONS -->
+
+                <div class="booking-form-actions">
+
+                    <a
+                        href="#"
+                        class="booking-cancel-button"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="booking-save-button"
+                    >
+                        Create Booking
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <img
+            src="{{ url_for('static',
+                            filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

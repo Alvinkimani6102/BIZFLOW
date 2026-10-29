@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+          <style>
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 48px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+}
+</style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+
+        <a href="/" class="brand">
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW Logo"
+            >
+        </a>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="/signup" class="signup-button">
+                Get Started
+            </a>
+        </nav>
+
+    </header>
+
+
+    <!-- LOGIN SECTION -->
+    <main class="signup-page">
+
+        <div class="signup-container">
+
+            <h1>Welcome Back</h1>
+
+            <p class="signup-description">
+                Login to your BIZFLOW account
+                and manage your businesses.
+            </p>
+
+
+            <!-- LOGIN FORM -->
+            <form action="/login" method="POST">
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                   <div class="password-wrapper">
+    <input
+        type="password"
+        id="login-password"
+        name="password"
+        placeholder="Enter your password"
+        required
+    >
+
+    <div class="forgot-password-link">
+    <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
+</div>
+    <button
+        type="button"
+        class="toggle-password"
+        onclick="togglePassword('login-password', this)"
+        aria-label="Show password"
+        title="Show password"
+    >👁</button>
+</div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="signup-submit"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- SIGNUP LINK -->
+            <p class="login-text">
+
+                Don't have a BIZFLOW account?
+
+                <a href="/signup">
+                    Create an account
+                </a>
+
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+    <script>
+function togglePassword(inputId, button) {
+    const passwordInput = document.getElementById(inputId);
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        button.textContent = "🙈";
+        button.setAttribute("aria-label", "Hide password");
+        button.setAttribute("title", "Hide password");
+    } else {
+        passwordInput.type = "password";
+        button.textContent = "👁";
+        button.setAttribute("aria-label", "Show password");
+        button.setAttribute("title", "Show password");
+    }
+}
+</script>
+
+</body>
+
+</html>

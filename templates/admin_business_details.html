@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Business Details | BIZFLOW Admin</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .business-details-page {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 24px;
+        }
+
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .details-header h1 {
+            margin: 0 0 8px;
+            color: #172554;
+        }
+
+        .details-header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .details-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+        }
+
+        .details-card-header {
+            padding: 20px 24px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .details-card-header h2 {
+            margin: 0;
+            color: #1e293b;
+            font-size: 19px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .detail-item {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-wrap: anywhere;
+        }
+
+        .detail-item:nth-child(odd) {
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .detail-label {
+            display: block;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .description-item {
+            grid-column: 1 / -1;
+            border-right: none !important;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 7px;
+            background: #1d4ed8;
+            color: white;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            background: #1e40af;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 12px;
+        }
+
+        @media (max-width: 650px) {
+            .business-details-page {
+                margin: 20px auto;
+                padding: 14px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-item:nth-child(odd) {
+                border-right: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="business-details-page">
+
+    <header class="details-header">
+        <div>
+            <h1>Business Details</h1>
+            <p>Administrative business profile overview</p>
+        </div>
+
+        <a class="back-link"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+    </header>
+
+    <section class="details-card">
+
+        <div class="details-card-header">
+            <h2>{{ business.get('name', 'Unnamed Business') }}</h2>
+        </div>
+
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <span class="detail-label">Business Name</span>
+                <span class="detail-value">
+                    {{ business.get('name', '—') }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Business Type</span>
+                <span class="detail-value">
+                    {{ business.get('type', '—') }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Owner Name</span>
+                <span class="detail-value">
+                    {{ owner.get('name', '—') if owner else 'Unknown owner' }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Owner Email</span>
+                <span class="detail-value">
+                    {{ owner.get('email', '—') if owner else '—' }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Business ID</span>
+                <span class="detail-value">
+                    {{ business.get('_id', '—') }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Owner ID</span>
+                <span class="detail-value">
+                    {{ business.get('owner_id', '—') }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Registration Date</span>
+                <span class="detail-value">
+                    {{ business.get('created_at', 'Not recorded') }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Business Status</span>
+                <span class="detail-value">
+                    {% if business.get('status') %}
+                        {{ business.get('status') }}
+                    {% elif business.get('is_active') is sameas false %}
+                        Inactive
+                    {% else %}
+                        Not specified
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="detail-item description-item">
+                <span class="detail-label">Description</span>
+                <span class="detail-value">
+                    {{ business.get('description', 'No description provided') or 'No description provided' }}
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

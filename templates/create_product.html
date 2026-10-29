@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Product | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+
+    <header class="navbar">
+
+        <a href="/dashboard" class="brand">
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW Logo"
+            >
+        </a>
+
+        <nav>
+
+            <a href="{{ url_for('products',
+                                business_id=business._id) }}">
+                Products
+            </a>
+
+            <a href="{{ url_for('business_workspace',
+                                business_id=business._id) }}">
+                Business
+            </a>
+
+            <a href="/logout" class="signup-button">
+                Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- CREATE PRODUCT WORKSPACE -->
+
+    <main class="create-product-page">
+
+        <div class="create-product-container">
+
+            <p class="workspace-label">
+                {{ business.name }}
+            </p>
+
+            <h1>
+                Create Product
+            </h1>
+
+            <p class="create-product-description">
+                Create and organize your product categories
+                and inventory.
+            </p>
+
+
+            <!-- CATEGORY HEADER -->
+
+            <section class="category-section">
+
+                <div class="category-section-header">
+
+                    <div>
+
+                        <h2>
+                            Product Categories
+                        </h2>
+
+                        <p>
+                            Create categories that match
+                            your business.
+                        </p>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        onclick="showCategoryForm()"
+                    >
+                        + Create Category
+                    </button>
+
+                </div>
+
+
+                <!-- CREATE CATEGORY FORM -->
+
+                <div
+                    id="category-form"
+                    class="category-form"
+                    style="display: none;"
+                >
+
+                    <form method="POST">
+
+                        <div class="form-group">
+
+                            <label for="category_name">
+                                Category Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="category_name"
+                                name="category_name"
+                                placeholder="e.g. Clothes"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="category-form-actions">
+
+                            <button
+                                type="submit"
+                                class="signup-submit"
+                            >
+                                Create Category
+                            </button>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                onclick="hideCategoryForm()"
+                            >
+                                Cancel
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <!-- CATEGORIES -->
+
+                <div class="categories-grid">
+
+                   {% if categories %}
+
+    {% for category in categories %}
+
+        <a href="{{ url_for('category_workspace',
+                   business_id=business._id,
+                   category_id=category._id) }}"
+   class="category-card">
+
+            <div class="category-card-icon">
+                📂
+            </div>
+
+            <div>
+
+                <h3>
+                    {{ category.name }}
+                </h3>
+
+                <p>
+                    Open category
+                </p>
+
+            </div>
+
+        </a>
+
+    {% endfor %}
+
+{% else %}
+
+    <div class="empty-category">
+
+        <div class="empty-category-icon">
+            📂
+        </div>
+
+        <h3>
+            No categories yet
+        </h3>
+
+        <p>
+            Create your first category
+            to organize your products.
+        </p>
+
+    </div>
+
+{% endif %}
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+
+    <!-- CATEGORY FORM SCRIPT -->
+
+    <script>
+
+        function showCategoryForm() {
+            document.getElementById("category-form").style.display = "block";
+        }
+
+        function hideCategoryForm() {
+            document.getElementById("category-form").style.display = "none";
+        }
+
+    </script>
+
+</body>
+
+</html>

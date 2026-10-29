@@ -1,0 +1,1251 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Corner | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+
+ 
+</head>
+
+<body data-business-id="{{ business._id }}">
+
+<header class="navbar">
+    <a href="{% if session.get('role') == 'worker' %}{{ url_for('business_workspace', business_id=business._id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="brand">
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW Logo"
+    >
+</a>
+
+    <nav>
+        <a href="{{ url_for('products', business_id=business._id) }}">
+            Products
+        </a>
+        <a href="{{ url_for('business_workspace', business_id=business._id) }}">
+            Business
+        </a>
+        <a href="/logout" class="signup-button">Logout</a>
+    </nav>
+</header>
+
+<main class="products-page">
+    <div class="products-container">
+
+        <p class="workspace-label">{{ business.name }}</p>
+        <h1>Customer Corner</h1>
+        <p>Find products, add them to a cart, and prepare a customer's purchase.</p>
+
+        
+<!-- OPEN CUSTOMER TABS -->
+<section class="sales-panel" id="open-customer-tabs" style="margin-bottom: 24px;">
+    <h2>📋 Open Customer Tabs</h2>
+    <p class="cart-muted">
+        Save unfinished purchases here, reopen them later, and complete payment when the customer is ready.
+    </p>
+
+    <div id="draft-status" class="cart-notice" role="status" aria-live="polite">
+        Open tabs will appear here.
+    </div>
+
+    
+<div id="draft-list">
+    <p class="cart-muted">Loading open tabs...</p>
+</div>
+
+<button
+    type="button"
+    id="refresh-drafts-button"
+    class="clear-cart"
+    style="margin-top: 12px;"
+>
+    Refresh Open Tabs
+</button>
+
+</section>
+
+
+        <div class="sales-layout">
+
+            <!-- PRODUCT SEARCH AND CATALOG -->
+            <section class="sales-panel">
+                <h2>Find Products</h2>
+                <p>Search by product name, SKU or description.</p>
+
+               
+<div class="product-search">
+    <div class="form-group">
+        <label for="q">Search products</label>
+        <input
+            type="search"
+            id="q"
+            name="q"
+            value="{{ search_term }}"
+            placeholder="Start typing a product name or SKU..."
+            autocomplete="off"
+            aria-describedby="search-help">
+        <small id="search-help">
+            Results update automatically as you type.
+        </small>
+    </div>
+    <button type="button" id="clear-product-search" class="clear-cart">
+        Clear Search
+    </button>
+</div>
+<p id="search-results-count" class="cart-muted" aria-live="polite"></p>
+
+
+                {% if search_term %}
+                    <p>
+                        <a href="{{ url_for('sell_products', business_id=business._id) }}">
+                            Clear search
+                        </a>
+                    </p>
+                {% endif %}
+
+                <hr>
+
+                <h2>Available Products</h2>
+
+                {% if products %}
+                    <div class="categories-grid">
+
+                        {% for product in products %}
+                           
+         <article
+             class="category-card sell-product-card"
+             data-search="{{ (product.name ~ ' ' ~ (product.sku|default('')) ~ ' ' ~ (product.description|default(''))) | lower }}">
+
+
+                                <div class="category-card-icon">📦</div>
+
+                                <div>
+                                    <h3>{{ product.name }}</h3>
+
+                                    {% if product.sku %}
+                                        <p>SKU: {{ product.sku }}</p>
+                                    {% endif %}
+
+                                                                        {% if product.selling_sizes %}
+                                        <p><strong>Available selling options:</strong></p>
+
+                                        {% for size in product.selling_sizes %}
+                                            <p>
+                                                {{ size.name }}:
+                                                <strong>KSh {{ "%.2f"|format(size.price|float) }}</strong>
+                                            </p>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>
+                                            Selling price:
+                                            <strong>
+                                                KSh {{ "%.2f"|format(product.selling_price|default(0)|float) }}
+                                            </strong>
+                                            per {{ product.measurement_type|default("Piece") }}
+                                        </p>
+                                    {% endif %}
+
+                                    <p>
+                                        Available stock:
+                                        <strong>{{ product.quantity|default(0) }}</strong>
+                                        {{ product.measurement_type|default("Piece") }}
+                                    </p>
+
+                                    {% if product.quantity|default(0)|float > 0 %}
+                                        <span class="stock-label">In stock</span>
+                                    {% else %}
+                                        <span class="stock-label out">Out of stock</span>
+                                    {% endif %}
+
+                                    
+                                    
+                                    {% if product.selling_sizes %}
+                                        <select class="selling-size-selector"
+                                                data-product-id="{{ product._id }}">
+                                            {% for size in product.selling_sizes %}
+                                                <option value="{{ size.name }}"
+                                                        data-price="{{ size.price }}"
+                                                        data-servings="{{ size.servings_per_piece }}">
+                                                    {{ size.name }} — KSh {{ size.price }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    {% endif %}
+
+                                    <button
+                                        type="button"
+                                        class="add-to-cart"
+                                        data-product-id="{{ product._id }}"
+                                        data-name="{{ product.name }}"
+                                        data-sku="{{ product.sku|default('') }}"
+                                        data-price="{{ product.selling_price|default(0)|float }}"
+                                        data-stock="{{ product.quantity|default(0)|float }}"
+                                        data-unit="{{ product.measurement_type|default('Piece') }}"
+                                        data-selling-sizes="{{ product.selling_sizes|default([])|tojson|forceescape }}"
+                                        {% if product.quantity|default(0)|float <= 0 %}
+                                            disabled
+                                        {% endif %}>
+                                        + Add to Cart
+                                    </button>
+
+                                </div>
+
+                            </article>
+                        {% endfor %}
+
+                    </div>
+                {% else %}
+                    <div class="empty-category">
+                        <div class="empty-category-icon">📦</div>
+                        <h3>No matching products</h3>
+                        <p>
+                            {% if search_term %}
+                                Try another search term.
+                            {% else %}
+                                Create products first, then return here to sell them.
+                            {% endif %}
+                        </p>
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- SHOPPING CART -->
+            <aside class="sales-panel" id="shopping-cart">
+    <button
+        type="button"
+        id="mobile-cart-toggle"
+        class="mobile-cart-toggle"
+        aria-expanded="false"
+        aria-controls="mobile-cart-content"
+    >
+        <span class="mobile-cart-left">
+            <span class="mobile-cart-icon">🛒</span>
+            <span>
+                <strong>Shopping cart</strong>
+                <small><span id="mobile-cart-count">0</span> items selected</small>
+            </span>
+        </span>
+
+        <span class="mobile-cart-right">
+            <strong id="mobile-cart-total">KSh 0.00</strong>
+            <span id="mobile-cart-toggle-icon" aria-hidden="true">⌃</span>
+        </span>
+    </button>
+
+    <div id="mobile-cart-content">
+                <h2>🛒 Shopping Cart</h2>
+                <p class="cart-muted">
+                    Add multiple products to one purchase.
+                </p>
+
+                <div id="cart-items" aria-live="polite">
+                    <p class="cart-empty">Your cart is empty.</p>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="cart-total-row">
+                        <span>Total</span>
+                        <span id="cart-total">KSh 0.00</span>
+                    </div>
+
+                    <p class="cart-muted">
+                        This is a preliminary total. Prices and stock must
+                        be checked again before a sale is saved.
+                    </p>
+
+                    <button type="button"
+                            class="clear-cart"
+                            id="clear-cart">
+                        Clear Cart
+                    </button>
+
+                    
+<div class="form-group" style="margin-top: 18px;">
+    <label for="draft-customer-name">Customer name or tab reference</label>
+<input
+    type="hidden"
+    id="active-draft-id"
+    value=""
+>
+
+    <input
+        type="text"
+        id="draft-customer-name"
+        maxlength="150"
+        placeholder="e.g. John or Table 4"
+        autocomplete="off"
+    >
+
+    
+</div>
+
+<button
+    type="button"
+    id="save-draft-button"
+    class="primary-button"
+>
+    Save as Open Tab
+</button>
+
+                </div>
+
+              
+<div class="cart-notice">
+    Prices and stock will be checked again when you confirm the sale.
+</div>
+
+<!-- CHECKOUT AND PAYMENT -->
+<section class="checkout-section">
+    <h2>Checkout</h2>
+    <p>Select the payment method and confirm the purchase.</p>
+
+    <form
+        id="checkout-form"
+        method="POST"
+        action="{{ url_for('confirm_product_sale', business_id=business._id) }}"
+    >
+
+    <input
+    type="hidden"
+    name="draft_id"
+    id="checkout-draft-id"
+    value=""
+>
+        <input type="hidden" name="cart_data" id="cart-data">
+
+        <input
+            type="hidden"
+            name="sale_token"
+            value="{{ sale_token }}"
+        >
+
+        
+<div class="form-group">
+    <label for="sale_type">Sale Type</label>
+    <select name="sale_type" id="sale_type" required>
+        <option value="paid">Paid Sale</option>
+        <option value="loan">Loan Sale (Pay Later)</option>
+    </select>
+</div>
+
+
+<div class="form-group" id="customer-name-group" hidden>
+    <label for="customer_name">Find Existing Customer or Add New</label>
+
+    <input
+        type="text"
+        name="customer_name"
+        id="customer_name"
+        maxlength="150"
+        autocomplete="off"
+        list="loan-customer-suggestions"
+        placeholder="Type a customer's name..."
+    >
+
+    <datalist id="loan-customer-suggestions"></datalist>
+
+    <small id="customer-search-status">
+        Type a name to search existing loan customers.
+    </small>
+</div>
+
+
+
+        <div class="form-group">
+
+            <label for="payment-method">Payment method</label>
+
+            <select id="payment-method" name="payment_method" required>
+                <option value="">Select payment method</option>
+                <option value="Credit" disabled>Credit</option>
+                <option value="Cash">Cash</option>
+                <option value="M-Pesa">M-Pesa</option>
+                <option value="Card">Card</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <button
+            type="submit"
+            id="confirm-sale-button"
+            class="primary-button"
+        >
+            Confirm Sale
+        </button>
+    </form>
+
+    <p class="cart-muted">
+        Selecting M-Pesa records the payment method; it does not
+        automatically verify the M-Pesa transaction.
+    </p>
+</section>
+
+                </div>
+                </aside>
+
+        </div>
+
+        <p style="margin-top: 24px;">
+            <a href="{{ url_for('products', business_id=business._id) }}">
+                ← Back to Products
+            </a>
+        </p>
+
+    </div>
+</main>
+
+<footer>
+    <img src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+    
+    alt="BIZFLOW" class="footer-logo">
+    <p>© 2026 BIZFLOW. All rights reserved.</p>
+    <p class="footer-tagline">Manage • Track • Grow</p>
+</footer>
+
+<script>
+    const BUSINESS_ID = document.body.dataset.businessId;
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const businessId = document.body.dataset.businessId;
+    const draftList = document.getElementById("draft-list");
+    const draftStatus = document.getElementById("draft-status");
+    const refreshButton = document.getElementById("refresh-drafts-button");
+
+    if (!businessId || !draftList || !draftStatus) return;
+
+    function formatMoney(value) {
+        return "KSh " + Number(value || 0).toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    async function loadDrafts() {
+        draftStatus.textContent = "Loading open customer tabs...";
+        draftList.replaceChildren();
+
+        try {
+            const response = await fetch(
+                `/business/${encodeURIComponent(businessId)}/sales-drafts`,
+                { headers: { "Accept": "application/json" } }
+            );
+
+            if (!response.ok) {
+                throw new Error("Could not load tabs.");
+            }
+
+            const data = await response.json();
+            const drafts = Array.isArray(data.drafts) ? data.drafts : [];
+
+            if (drafts.length === 0) {
+                draftList.textContent = "There are no open customer tabs yet.";
+                draftStatus.textContent = "No open tabs.";
+                return;
+            }
+
+            drafts.forEach(function (draft) {
+                const card = document.createElement("div");
+                card.className = "cart-item";
+
+                const name = document.createElement("h3");
+                name.textContent = draft.customer_name;
+
+                const details = document.createElement("p");
+                details.className = "cart-muted";
+                details.textContent =
+                    `${draft.item_count} product type(s) · ${formatMoney(draft.total)}`;
+
+                const openButton = document.createElement("button");
+                openButton.type = "button";
+                openButton.className = "primary-button";
+                openButton.textContent = "Open Tab";
+
+                openButton.addEventListener("click", async function () {
+                    const proceed = confirm(
+    "Open this saved tab in the shopping cart?"
+);
+
+if (!proceed) return;
+
+openButton.disabled = true;
+openButton.textContent = "Opening...";
+
+try {
+    const response = await fetch(
+        `/business/${encodeURIComponent(businessId)}/sales-drafts/${encodeURIComponent(draft.id)}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || "Could not open this tab.");
+    }
+
+    window.dispatchEvent(
+        new CustomEvent("bizflow:restore-draft", {
+            detail: data
+        })
+    );
+
+    const activeDraftField = document.getElementById("active-draft-id");
+
+if (activeDraftField) {
+    activeDraftField.value = draft.id;
+}
+
+} catch (error) {
+    console.error("BIZFLOW open tab:", error);
+    alert(error.message);
+} finally {
+    openButton.disabled = false;
+    openButton.textContent = "Open Tab";
+}
+                });
+
+                card.append(name, details, openButton);
+                draftList.appendChild(card);
+            });
+
+            draftStatus.textContent = `${drafts.length} open customer tab(s).`;
+        } catch (error) {
+            console.error("BIZFLOW open tabs:", error);
+            draftStatus.textContent = "Unable to load tabs. Please try again.";
+            draftList.textContent = "Check your connection and refresh the page.";
+        }
+    }
+
+    if (refreshButton) {
+        refreshButton.addEventListener("click", loadDrafts);
+    }
+
+    loadDrafts();
+});
+</script>
+
+
+<script>
+(() => {
+    "use strict";
+
+    const businessId = document.body.dataset.businessId;
+    const storageKey = "bizflow_cart_" + businessId;
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+if (urlParams.get("new_sale") === "1") {
+    sessionStorage.removeItem(storageKey);
+
+    // Remove the new_sale parameter from the URL.
+    window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+    );
+}
+
+    
+
+    const cartItemsElement = document.getElementById("cart-items");
+    const cartTotalElement = document.getElementById("cart-total");
+    const clearCartButton = document.getElementById("clear-cart");
+
+    let cart = {};
+
+    // Keep the cart when the user searches for another product.
+    try {
+        const savedCart = sessionStorage.getItem(storageKey);
+        if (savedCart) {
+            const parsedCart = JSON.parse(savedCart);
+            if (parsedCart && typeof parsedCart === "object" &&
+                !Array.isArray(parsedCart)) {
+                cart = parsedCart;
+            }
+        }
+    } catch (error) {
+        cart = {};
+    }
+
+    function money(value) {
+        return "KSh " + Number(value).toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function isWholeUnit(unit) {
+        return ["piece", "pieces", "item", "items"]
+            .includes(String(unit).trim().toLowerCase());
+    }
+
+    function quantityStep(unit) {
+        return isWholeUnit(unit) ? "1" : "0.01";
+    }
+
+    function saveCart() {
+        try {
+            sessionStorage.setItem(storageKey, JSON.stringify(cart));
+        } catch (error) {
+            // The current page cart can still be used if storage is unavailable.
+        }
+    }
+
+    
+function renderCart() {
+    cartItemsElement.replaceChildren();
+
+    const entries = Object.entries(cart).filter(([id, item]) => {
+        return item && Number(item.quantity) > 0;
+    });
+
+    let total = 0;
+
+    if (entries.length === 0) {
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "cart-empty";
+        emptyMessage.textContent = "Your cart is empty.";
+        cartItemsElement.appendChild(emptyMessage);
+    }
+
+    entries.forEach(([id, item]) => {
+        const quantity = Number(item.quantity);
+        const price = Number(item.price);
+        const stock = Number(item.stock);
+        const lineTotal = quantity * price;
+
+        total += lineTotal;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "cart-item";
+
+        const heading = document.createElement("div");
+        heading.className = "cart-item-heading";
+
+        const details = document.createElement("div");
+
+        const name = document.createElement("h3");
+        name.textContent = item.name;
+
+        const priceText = document.createElement("p");
+        priceText.className = "cart-muted";
+        priceText.textContent =
+            money(price) + " per " + item.unit;
+
+        details.append(name, priceText);
+
+        if (item.sellingSize && item.servingsPerPiece > 0) {
+            const servingInfo = document.createElement("p");
+            servingInfo.className = "cart-muted";
+            servingInfo.textContent =
+                "Uses " +
+                (quantity / Number(item.servingsPerPiece))
+                    .toLocaleString("en-KE", {
+                        maximumFractionDigits: 4
+                    }) +
+                " piece(s) of stock";
+            details.appendChild(servingInfo);
+        }
+
+        if (item.sku) {
+            const sku = document.createElement("p");
+            sku.className = "cart-muted";
+            sku.textContent = "SKU: " + item.sku;
+            details.appendChild(sku);
+        }
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "remove-item";
+        removeButton.textContent = "Remove";
+
+        removeButton.addEventListener("click", () => {
+            delete cart[id];
+            saveCart();
+            renderCart();
+        });
+
+        heading.append(details, removeButton);
+
+        const controls = document.createElement("div");
+        controls.className = "cart-controls";
+
+        const quantityLabel = document.createElement("label");
+        quantityLabel.textContent = "Qty:";
+        quantityLabel.htmlFor = "cart-qty-" + id;
+
+        const quantityInput = document.createElement("input");
+        quantityInput.type = "number";
+        quantityInput.id = "cart-qty-" + id;
+        quantityInput.className = "cart-quantity";
+        quantityInput.min = quantityStep(item.unit);
+        quantityInput.step = quantityStep(item.unit);
+        quantityInput.max = String(stock);
+        quantityInput.value = String(quantity);
+        quantityInput.setAttribute(
+            "aria-label", "Quantity for " + item.name
+        );
+
+        quantityInput.addEventListener("change", () => {
+            let newQuantity = Number(quantityInput.value);
+
+            if (!Number.isFinite(newQuantity) || newQuantity <= 0) {
+                delete cart[id];
+            } else {
+                if (isWholeUnit(item.unit)) {
+                    newQuantity = Math.floor(newQuantity);
+                }
+
+                newQuantity = Math.min(newQuantity, stock);
+
+                if (newQuantity <= 0) {
+                    delete cart[id];
+                } else {
+                    cart[id].quantity = newQuantity;
+                }
+            }
+
+            saveCart();
+            renderCart();
+        });
+
+        controls.append(quantityLabel, quantityInput);
+
+        const lineTotalElement = document.createElement("p");
+        lineTotalElement.className = "cart-line-total";
+        lineTotalElement.textContent =
+            "Subtotal: " + money(lineTotal);
+
+        wrapper.append(heading, controls, lineTotalElement);
+        cartItemsElement.appendChild(wrapper);
+    });
+
+    cartTotalElement.textContent = money(total);
+
+    const mobileCartCount = document.getElementById("mobile-cart-count");
+    const mobileCartTotal = document.getElementById("mobile-cart-total");
+
+    const totalItems = Object.values(cart).reduce(
+        (sum, item) => sum + Number(item.quantity || 0),
+        0
+    );
+
+    if (mobileCartCount) {
+        mobileCartCount.textContent = totalItems;
+    }
+
+    if (mobileCartTotal) {
+        mobileCartTotal.textContent = money(total);
+    }
+}
+
+
+    
+window.addEventListener("bizflow:restore-draft", function (event) {
+    const data = event.detail;
+
+    if (!data || !Array.isArray(data.items)) {
+        alert("Invalid customer tab data.");
+        return;
+    }
+
+    const restoredCart = {};
+
+    data.items.forEach(function (item) {
+        const productId = item.product_id;
+        const sellingSize = item.selling_size || "";
+        const cartKey = sellingSize
+            ? `${productId}::${sellingSize}`
+            : productId;
+
+        restoredCart[cartKey] = {
+            productId: productId,
+            name: sellingSize
+                ? `${item.name} (${sellingSize})`
+                : item.name,
+            sku: item.sku || "",
+            price: Number(item.price),
+            stock: Number(item.stock),
+            unit: sellingSize || item.unit || "Piece",
+            quantity: Number(item.quantity),
+            sellingSize: sellingSize,
+            servingsPerPiece: Number(item.servings_per_piece || 1)
+        };
+    });
+
+    if (Object.keys(restoredCart).length === 0) {
+        alert("This tab has no available products to restore.");
+        return;
+    }
+
+    cart = restoredCart;
+    saveCart();
+    renderCart();
+
+    const customerField = document.getElementById("draft-customer-name");
+
+    if (customerField) {
+        customerField.value = data.customer_name || "";
+    }
+
+    
+    const checkoutDraftField = document.getElementById("checkout-draft-id");
+    const activeDraftField = document.getElementById("active-draft-id");
+
+    if (checkoutDraftField) {
+        checkoutDraftField.value = data.id || "";
+    }
+
+    if (activeDraftField) {
+        activeDraftField.value = data.id || "";
+    }
+
+
+    const draftStatus = document.getElementById("draft-status");
+
+    if (draftStatus) {
+        draftStatus.textContent =
+            "Opened tab for " +
+            (data.customer_name || "Customer") +
+            ". You can add more products or continue checkout.";
+    }
+
+    const shoppingCart = document.getElementById("shopping-cart");
+
+    if (shoppingCart) {
+        shoppingCart.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+});
+
+
+        document.querySelectorAll(".add-to-cart").forEach(button => {
+    button.addEventListener("click", () => {
+        const id = button.dataset.productId;
+        const name = button.dataset.name;
+        const sku = button.dataset.sku || "";
+        const stock = Number(button.dataset.stock);
+        const unit = button.dataset.unit || "Piece";
+
+        let price = Number(button.dataset.price);
+        let selectedSize = "";
+        let servingsPerPiece = 1;
+
+        const sizeSelector = document.querySelector(
+            `.selling-size-selector[data-product-id="${id}"]`
+        );
+
+        if (sizeSelector) {
+            const option = sizeSelector.selectedOptions[0];
+
+            if (!option) {
+                alert("Please select a selling size.");
+                return;
+            }
+
+            selectedSize = option.value;
+            price = Number(option.dataset.price);
+            servingsPerPiece = Number(option.dataset.servings);
+        }
+
+        if (
+            !id ||
+            !Number.isFinite(price) ||
+            price <= 0 ||
+            !Number.isFinite(stock) ||
+            stock <= 0 ||
+            !Number.isFinite(servingsPerPiece) ||
+            servingsPerPiece <= 0
+        ) {
+            alert("This product cannot be added to the cart.");
+            return;
+        }
+
+        const cartKey = selectedSize ? `${id}::${selectedSize}` : id;
+
+        if (cart[cartKey]) {
+            cart[cartKey].quantity =
+                Number(cart[cartKey].quantity) + 1;
+        } else {
+            cart[cartKey] = {
+                productId: id,
+                name: selectedSize
+                    ? `${name} (${selectedSize})`
+                    : name,
+                sku: sku,
+                price: price,
+                stock: stock * servingsPerPiece,
+                unit: selectedSize || unit,
+                quantity: 1,
+                sellingSize: selectedSize,
+                servingsPerPiece: servingsPerPiece
+            };
+        }
+
+        saveCart();
+        renderCart();
+    });
+});
+
+    clearCartButton.addEventListener("click", () => {
+        if (Object.keys(cart).length === 0) {
+            return;
+        }
+
+        if (confirm("Remove all products from this cart?")) {
+            cart = {};
+            saveCart();
+            renderCart();
+        }
+    });
+
+    
+     const checkoutForm = document.getElementById("checkout-form");
+
+     
+const saveDraftButton = document.getElementById("save-draft-button");
+const draftCustomerName = document.getElementById("draft-customer-name");
+
+if (saveDraftButton && draftCustomerName) {
+    saveDraftButton.addEventListener("click", async function () {
+        const customerName = draftCustomerName.value.trim();
+
+        if (!customerName) {
+            alert("Enter a customer name or tab reference first.");
+            draftCustomerName.focus();
+            return;
+        }
+
+        const entries = Object.entries(cart).filter(([id, item]) => {
+            return item && Number(item.quantity) > 0;
+        });
+
+        if (entries.length === 0) {
+            alert("Add at least one product before saving a tab.");
+            return;
+        }
+
+        
+        const draftCart = {};
+
+        for (const [cartKey, item] of entries) {
+            const quantity = Number(item.quantity);
+
+            if (!Number.isFinite(quantity) || quantity <= 0) {
+                alert("Please check the quantities in your cart.");
+                return;
+            }
+
+            draftCart[cartKey] = {
+                productId: item.productId || cartKey.split("::")[0],
+                quantity: quantity,
+                sellingSize: item.sellingSize || "",
+                servingsPerPiece: Number(item.servingsPerPiece || 1),
+                price: Number(item.price)
+            };
+        }
+
+
+        const originalText = saveDraftButton.textContent;
+        saveDraftButton.disabled = true;
+        saveDraftButton.textContent = "Saving Tab...";
+
+        try {
+            const formData = new FormData();
+            const activeDraftId = document.getElementById("active-draft-id");
+
+if (activeDraftId && activeDraftId.value) {
+    formData.append("draft_id", activeDraftId.value);
+}
+            formData.append("customer_name", customerName);
+            formData.append("cart_data", JSON.stringify(draftCart));
+
+            const response = await fetch(
+                `/business/${encodeURIComponent(businessId)}/sales-drafts/save`,
+                {
+                    method: "POST",
+                    body: formData,
+                    redirect: "follow"
+                }
+            );
+
+            if (!response.ok) {
+                const message = await response.text();
+                throw new Error(message || "Could not save the tab.");
+            }
+
+            cart = {};
+            saveCart();
+            renderCart();
+            draftCustomerName.value = "";
+
+            alert("Customer tab saved successfully.");
+            window.location.reload();
+        } catch (error) {
+            console.error("BIZFLOW save draft:", error);
+            alert("Could not save the tab: " + error.message);
+        } finally {
+            saveDraftButton.disabled = false;
+            saveDraftButton.textContent = originalText;
+        }
+    });
+}
+
+const cartDataInput = document.getElementById("cart-data");
+const confirmSaleButton = document.getElementById("confirm-sale-button");
+
+checkoutForm.addEventListener("submit", function (event) {
+    const entries = Object.entries(cart).filter(([id, item]) => {
+        return item && Number(item.quantity) > 0;
+    });
+
+    if (entries.length === 0) {
+        event.preventDefault();
+        alert("Please add at least one product to the cart.");
+        return;
+    }
+
+    
+const saleCart = [];
+
+for (const [cartKey, item] of entries) {
+    const quantity = Number(item.quantity);
+    const productId = item.productId || cartKey;
+
+    if (
+        !productId ||
+        !Number.isFinite(quantity) ||
+        quantity <= 0
+    ) {
+        event.preventDefault();
+        alert("Please enter a valid quantity for every product.");
+        return;
+    }
+
+    saleCart.push({
+        product_id: productId,
+        quantity: quantity,
+        selling_size: item.sellingSize || ""
+    });
+}
+
+cartDataInput.value = JSON.stringify(saleCart);
+
+
+    confirmSaleButton.disabled = true;
+    confirmSaleButton.textContent = "Processing Sale...";
+});
+    renderCart();
+})();
+
+const mobileCartToggle = document.getElementById("mobile-cart-toggle");
+const shoppingCart = document.getElementById("shopping-cart");
+
+if (mobileCartToggle && shoppingCart) {
+    mobileCartToggle.addEventListener("click", () => {
+        const isOpen = shoppingCart.classList.toggle("mobile-cart-open");
+
+        mobileCartToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+}
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const saleType = document.getElementById("sale_type");
+    const customerGroup = document.getElementById("customer-name-group");
+    const customerInput = document.getElementById("customer_name");
+    const suggestions = document.getElementById("loan-customer-suggestions");
+    const status = document.getElementById("customer-search-status");
+
+    if (!saleType || !customerGroup || !customerInput || !suggestions) {
+        console.error("BIZFLOW customer-search elements are missing.");
+        return;
+    }
+
+    const businessId = document.body.dataset.businessId;
+    let searchTimer;
+    let latestSearch = 0;
+
+    function updateSaleFields() {
+        const isLoan = saleType.value === "loan";
+
+        
+const paymentMethod = document.getElementById("payment-method");
+
+if (paymentMethod) {
+    if (isLoan) {
+        paymentMethod.value = "Credit";
+        paymentMethod.disabled = true;
+    } else {
+        paymentMethod.disabled = false;
+        paymentMethod.value = "";
+    }
+}
+
+
+        customerGroup.hidden = !isLoan;
+        customerInput.required = isLoan;
+
+        if (!isLoan) {
+            customerInput.value = "";
+            suggestions.replaceChildren();
+            if (status) status.textContent = "";
+        } else {
+            customerInput.focus();
+            if (status) {
+                status.textContent =
+                    "Type a name to find an existing loan customer, or enter a new name.";
+            }
+        }
+    }
+
+    saleType.addEventListener("change", updateSaleFields);
+    updateSaleFields();
+
+    customerInput.addEventListener("input", function () {
+        const query = customerInput.value.trim();
+        const searchNumber = ++latestSearch;
+
+        clearTimeout(searchTimer);
+        suggestions.replaceChildren();
+
+        if (!query) {
+            if (status) {
+                status.textContent = "Type a customer's name to search.";
+            }
+            return;
+        }
+
+        if (status) status.textContent = "Searching customers...";
+
+        searchTimer = setTimeout(async function () {
+            try {
+                const url =
+                    `/business/${encodeURIComponent(businessId)}` +
+                    `/loan-customer-search?q=${encodeURIComponent(query)}`;
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error("Search request failed: " + response.status);
+                }
+
+                const data = await response.json();
+
+                if (searchNumber !== latestSearch ||
+                    customerInput.value.trim() !== query) {
+                    return;
+                }
+
+                const names = Array.isArray(data.names) ? data.names : [];
+
+                names.forEach(function (name) {
+                    const option = document.createElement("option");
+                    option.value = name;
+                    suggestions.appendChild(option);
+                });
+
+                if (status) {
+                    status.textContent = names.length
+                        ? `${names.length} matching customer(s). Select a suggestion or continue typing.`
+                        : "No matching loan customer found. You can enter a new customer name.";
+                }
+            } catch (error) {
+                console.error("BIZFLOW customer search error:", error);
+                if (status) {
+                    status.textContent =
+                        "Customer search is unavailable. You can still enter the customer's name.";
+                }
+            }
+        }, 200);
+    });
+});
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("q");
+    const clearButton = document.getElementById("clear-product-search");
+    const resultsCount = document.getElementById("search-results-count");
+    const cards = Array.from(
+        document.querySelectorAll(".sell-product-card")
+    );
+
+    if (!searchInput || !clearButton || !resultsCount) return;
+
+    
+function filterProducts() {
+    const query = searchInput.value.trim().toLowerCase();
+
+    const rankedCards = cards.map(function (card, index) {
+        const searchableText = card.dataset.search || "";
+        const nameElement = card.querySelector("h3");
+        const productName = nameElement
+            ? nameElement.textContent.trim().toLowerCase()
+            : "";
+
+        let rank = 2; // Other products appear below matches.
+
+        if (!query) {
+            rank = 0;
+        } else if (productName.startsWith(query)) {
+            rank = 0; // Product name starts with the search.
+        } else if (productName.includes(query)) {
+            rank = 1; // Product name contains the search.
+        } else if (searchableText.includes(query)) {
+            rank = 1; // Match SKU or description.
+        }
+
+        return { card: card, rank: rank, index: index };
+    });
+
+    rankedCards.sort(function (a, b) {
+        return a.rank - b.rank || a.index - b.index;
+    });
+
+    const grid = document.querySelector(".categories-grid");
+
+    if (grid) {
+        rankedCards.forEach(function (item) {
+            grid.appendChild(item.card);
+        });
+    }
+
+    const matches = rankedCards.filter(function (item) {
+        return query && item.rank < 2;
+    }).length;
+
+    resultsCount.textContent = query
+        ? `${matches} matching product${matches === 1 ? "" : "s"} moved to the top`
+        : `${cards.length} product${cards.length === 1 ? "" : "s"} available`;
+}
+
+
+    searchInput.addEventListener("input", filterProducts);
+
+    clearButton.addEventListener("click", function () {
+        searchInput.value = "";
+        filterProducts();
+        searchInput.focus();
+    });
+
+    filterProducts();
+});
+</script>
+</body>
+</html>
+

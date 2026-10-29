@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bookings | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+
+        <a href="{% if session.get('role') == 'worker' %}{{ url_for('business_workspace', business_id=business._id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="brand">
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW Logo"
+    >
+</a>
+
+        <nav>
+
+            <a href="{{ url_for('business_workspace',
+                                business_id=business._id) }}">
+                Workspace
+            </a>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/logout" class="signup-button">
+                Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- BOOKINGS PAGE -->
+
+    <main class="bookings-page">
+
+        <div class="bookings-container">
+
+
+            <!-- PAGE HEADER -->
+
+            <section class="bookings-header">
+
+                <div>
+
+                    <p class="bookings-label">
+                        SERVICE MANAGEMENT
+                    </p>
+
+                    <h1>
+                        Bookings
+                    </h1>
+
+                    <p>
+                        Manage customer appointments,
+                        schedules and service bookings.
+                    </p>
+
+                </div>
+
+                <a
+    href="{{ url_for('new_booking', business_id=business._id) }}"
+    class="booking-primary-button"
+>
+    + New Booking
+</a>
+
+            </section>
+
+
+            <!-- STATISTICS -->
+
+            <section class="booking-stats">
+
+
+                <!-- TOTAL BOOKINGS -->
+
+                <div class="booking-stat-card">
+
+                    <div class="booking-stat-icon">
+                        📅
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Total Bookings
+                        </span>
+
+                        <strong>
+    {{ total_bookings }}
+</strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PENDING -->
+
+                <div class="booking-stat-card">
+
+                    <div class="booking-stat-icon">
+                        ⏳
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Pending
+                        </span>
+
+                       <strong>
+    {{ pending_bookings }}
+</strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONFIRMED -->
+
+                <div class="booking-stat-card">
+
+                    <div class="booking-stat-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Confirmed
+                        </span>
+
+                        <strong>
+    {{ confirmed_bookings }}
+</strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMPLETED -->
+
+                <div class="booking-stat-card">
+
+                    <div class="booking-stat-icon">
+                        ✔
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Completed
+                        </span>
+
+                       <strong>
+    {{ completed_bookings }}
+</strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+            <!-- =========================
+     REVENUE & PAYMENTS
+========================= -->
+
+<section class="booking-revenue-section">
+
+    <div class="section-heading">
+        <h2>Revenue & Payments</h2>
+        <p>Track booking income and payment activity.</p>
+    </div>
+
+    <div class="booking-stats">
+
+        <!-- Today's Revenue -->
+        <div class="booking-stat-card">
+
+            <div class="booking-stat-icon">
+                💰
+            </div>
+
+            <div class="booking-stat-content">
+
+                <span class="booking-stat-label">
+                    Today's Revenue
+                </span>
+
+                <strong class="booking-stat-value">
+                    KSh {{ "%.2f"|format(today_revenue) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- This Week's Revenue -->
+        <div class="booking-stat-card">
+
+            <div class="booking-stat-icon">
+                📈
+            </div>
+
+            <div class="booking-stat-content">
+
+                <span class="booking-stat-label">
+                    This Week
+                </span>
+
+                <strong class="booking-stat-value">
+                    KSh {{ "%.2f"|format(this_week_revenue) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- This Month's Revenue -->
+        <div class="booking-stat-card">
+
+            <div class="booking-stat-icon">
+                📊
+            </div>
+
+            <div class="booking-stat-content">
+
+                <span class="booking-stat-label">
+                    This Month
+                </span>
+
+                <strong class="booking-stat-value">
+                    KSh {{ "%.2f"|format(this_month_revenue) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- Paid Bookings -->
+        <div class="booking-stat-card">
+
+            <div class="booking-stat-icon">
+                ✅
+            </div>
+
+            <div class="booking-stat-content">
+
+                <span class="booking-stat-label">
+                    Paid Bookings
+                </span>
+
+                <strong class="booking-stat-value">
+                    {{ paid_bookings }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- Pending Payments -->
+        <div class="booking-stat-card">
+
+            <div class="booking-stat-icon">
+                ⏳
+            </div>
+
+            <div class="booking-stat-content">
+
+                <span class="booking-stat-label">
+                    Pending Payments
+                </span>
+
+                <strong class="booking-stat-value">
+                    {{ pending_payment_bookings }}
+                </strong>
+
+            </div>
+            <!-- Outstanding Balance -->
+<div class="booking-stat-card">
+
+    <div class="booking-stat-icon">
+        💳
+    </div>
+
+    <div class="booking-stat-content">
+
+        <span class="booking-stat-label">
+            Outstanding Balance
+        </span>
+
+        <strong class="booking-stat-value">
+            KSh {{ "%.2f"|format(total_outstanding) }}
+        </strong>
+
+    </div>
+
+</div>
+
+        </div>
+
+    </div>
+
+</section>
+
+                <!-- =========================
+     BOOKING PERIOD TRACKING
+========================= -->
+
+<section class="booking-period-section">
+
+    <div class="booking-period-header">
+
+        <div>
+
+            <p class="bookings-label">
+                BOOKING TRACKING
+            </p>
+
+            <h2>
+                Booking Schedule
+            </h2>
+
+            <p>
+                Track appointments by day, week and month.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="booking-period-grid">
+
+
+        <!-- TODAY -->
+
+        <div class="booking-period-card">
+
+            <div class="booking-period-icon">
+                📅
+            </div>
+
+            <div>
+
+                <span>
+                    Today
+                </span>
+
+                <strong>
+                    {{ today_bookings }}
+                </strong>
+
+                <small>
+                    Bookings today
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- THIS WEEK -->
+
+        <div class="booking-period-card">
+
+            <div class="booking-period-icon">
+                🗓️
+            </div>
+
+            <div>
+
+                <span>
+                    This Week
+                </span>
+
+                <strong>
+                    {{ this_week_bookings }}
+                </strong>
+
+                <small>
+                    Monday to Sunday
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- THIS MONTH -->
+
+        <div class="booking-period-card">
+
+            <div class="booking-period-icon">
+                📊
+            </div>
+
+            <div>
+
+                <span>
+                    This Month
+                </span>
+
+                <strong>
+                    {{ this_month_bookings }}
+                </strong>
+
+                <small>
+                    Current month
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+            <!-- =========================
+     BOOKING ANALYTICS
+========================= -->
+
+<section class="booking-analytics-section">
+
+    <div class="booking-period-header">
+
+        <div>
+
+            <p class="bookings-label">
+                BUSINESS ANALYTICS
+            </p>
+
+            <h2>
+                Booking Analytics
+            </h2>
+
+            <p>
+                Understand your bookings, payments and service performance.
+            </p>
+
+        </div>
+
+    </div>
+    <div class="analytics-cards">
+
+    <div class="analytics-card">
+        <span class="analytics-card-label">Total Bookings</span>
+        <strong>{{ total_bookings }}</strong>
+        <small>All bookings</small>
+    </div>
+
+    <div class="analytics-card">
+        <span class="analytics-card-label">Paid Bookings</span>
+        <strong>{{ paid_bookings }}</strong>
+        <small>Fully paid bookings</small>
+    </div>
+
+    <div class="analytics-card">
+    <span class="analytics-card-label">Total Booking Value</span>
+    <strong>KSh {{ "%.2f"|format(total_booking_value) }}</strong>
+    <small>Total value of bookings</small>
+</div>
+
+    <div class="analytics-card">
+    <span class="analytics-card-label">Total Customers</span>
+    <strong>{{ total_customers }}</strong>
+    <small>Unique customers</small>
+</div>
+
+
+    <div class="analytics-card">
+        <span class="analytics-card-label">Pending Payments</span>
+        <strong>{{ pending_payment_bookings }}</strong>
+        <small>Unpaid or partial</small>
+    </div>
+
+    <div class="analytics-card">
+        <span class="analytics-card-label">Outstanding Balance</span>
+        <strong>KSh {{ "%.2f"|format(total_outstanding) }}</strong>
+        <small>Money still owed</small>
+    </div>
+
+    <div class="analytics-card">
+    <span class="analytics-card-label">Paid Payments</span>
+    <strong>{{ paid_payment_count }}</strong>
+    <small>Fully paid</small>
+</div>
+
+<div class="analytics-card">
+    <span class="analytics-card-label">Partial Payments</span>
+    <strong>{{ partial_payment_count }}</strong>
+    <small>Partially paid</small>
+</div>
+
+<div class="analytics-card">
+    <span class="analytics-card-label">Unpaid Payments</span>
+    <strong>{{ unpaid_payment_count }}</strong>
+    <small>No payment received</small>
+</div>
+
+</div>
+
+</section>
+
+
+            <!-- BOOKINGS SECTION -->
+
+            <section class="bookings-section">
+
+                <div class="bookings-section-header">
+
+                    <div>
+
+                        <h2>
+                            Recent Bookings
+                        </h2>
+
+                        <p>
+                            View and manage your customer appointments.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                                </div>
+
+<!-- =========================
+     BOOKING FILTER
+========================= -->
+<div class="booking-search">
+    <label for="bookingSearch">Search Bookings</label>
+    <input
+        type="text"
+        id="bookingSearch"
+        placeholder="Search customer, phone, or service..."
+    >
+</div>
+
+<div class="booking-filter">
+
+    <label for="statusFilter">
+        Filter by Status
+    </label>
+
+    <select id="statusFilter">
+        <option value="all">All Bookings</option>
+        <option value="Pending">Pending</option>
+        <option value="Confirmed">Confirmed</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+        <option value="No Show">No Show</option>
+    </select>
+
+</div>
+<div class="booking-filter">
+    <label for="dateFilter">Filter by Date</label>
+    <select id="dateFilter">
+        <option value="all">All Dates</option>
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+        <option value="previous-month">Previous Month</option>
+    </select>
+</div>
+<div class="booking-filter">
+
+    <label for="startDate">
+        From
+    </label>
+
+    <input
+        type="date"
+        id="startDate"
+    >
+
+    <label for="endDate">
+        To
+    </label>
+
+    <input
+        type="date"
+        id="endDate"
+    >
+
+</div>
+<div class="booking-filter">
+    <label for="sortBookings">Sort By</label>
+
+    <select id="sortBookings">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="amount-high">Highest Amount</option>
+        <option value="amount-low">Lowest Amount</option>
+    </select>
+</div>
+
+
+<!-- BOOKINGS TABLE -->
+
+<div class="bookings-table-wrapper">
+
+<!-- BOOKINGS TABLE -->
+
+<div class="bookings-table-wrapper">
+
+    {% if bookings %}
+
+    <table class="bookings-table">
+
+        <thead>
+
+            <tr>
+                <th>Customer</th>
+                <th>Service</th>
+                <th>Date & Time</th>
+                <th>Duration</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Actions</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for booking in bookings %}
+
+            <tr data-booking-id="{{ booking._id }}">
+
+                <td>
+                    <strong>
+                        {{ booking.customer }}
+                    </strong>
+
+                    <br>
+
+                    <small>
+                        {{ booking.contact }}
+                    </small>
+                </td>
+
+                
+<td>
+    {% if booking.services %}
+        {% for item in booking.services %}
+            <div style="margin-bottom: 6px;">
+                <strong>{{ item.name }}</strong>
+                <br>
+                <small>
+                    KSh {{ "%.2f"|format(item.price|float) }}
+                </small>
+            </div>
+        {% endfor %}
+    {% else %}
+        {{ booking.service }}
+    {% endif %}
+</td>
+>
+
+                <td>
+                   <td>
+    <span
+        class="booking-date"
+        data-date="{{ booking.booking_date }}"
+    >
+        {{ booking.booking_date }}
+    </span>
+
+    <br>
+
+                    <br>
+
+                    <small>
+                        {{ booking.appointment_time }}
+                    </small>
+                </td>
+
+                <td>
+                    {{ booking.duration }}
+                </td>
+
+                <td>
+    <strong>
+        KSh {{ "%.2f"|format(booking.amount) }}
+    </strong>
+
+    <br>
+
+    <small>
+        Paid:
+        KSh {{ "%.2f"|format(booking.get("amount_paid", 0)) }}
+    </small>
+
+    <br>
+
+    <small>
+        Balance:
+        KSh {{ "%.2f"|format(
+            booking.amount - booking.get("amount_paid", 0)
+        ) }}
+    </small>
+</td>
+
+                <td>
+    {% if booking.status == "Pending" %}
+        <span class="booking-status pending">Pending</span>
+
+    {% elif booking.status == "Confirmed" %}
+        <span class="booking-status confirmed">Confirmed</span>
+
+    {% elif booking.status == "In Progress" %}
+        <span class="booking-status in-progress">In Progress</span>
+
+    {% elif booking.status == "Completed" %}
+        <span class="booking-status completed">Completed</span>
+
+    {% elif booking.status == "Cancelled" %}
+        <span class="booking-status cancelled">Cancelled</span>
+
+    {% elif booking.status == "No Show" %}
+        <span class="booking-status no-show">No Show</span>
+
+    {% else %}
+        <span class="booking-status">{{ booking.status }}</span>
+    {% endif %}
+</td>
+
+               <td>
+    {{ booking.payment_status }}
+</td>
+
+<td>
+    <a
+    href="{{ url_for('view_booking', business_id=business._id, booking_id=booking._id) }}"
+    class="booking-view-button"
+>
+    👁 View
+</a>
+
+    <a
+        href="{{ url_for(
+            'edit_booking',
+            business_id=business._id,
+            booking_id=booking._id
+        ) }}"
+        class="booking-edit-button"
+    >
+        ✏ Edit
+    </a>
+   {% if booking.status != "Completed" %}
+<form
+    method="POST"
+    action="{{ url_for(
+        'complete_booking',
+        business_id=business._id,
+        booking_id=booking._id
+    ) }}"
+    style="display:inline;"
+>
+    <button type="submit" class="booking-complete-button">
+        ✓ Complete
+    </button>
+</form>
+{% else %}
+<span class="booking-completed-label">
+    ✓ Completed
+</span>
+{% endif %}
+
+</td>
+
+
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="booking-pagination">
+
+    <button type="button" id="prevPage">
+        ← Previous
+    </button>
+
+    <span id="pageInfo">
+        Page 1
+    </span>
+
+    <button type="button" id="nextPage">
+        Next →
+    </button>
+
+</div>
+
+    {% else %}
+
+    <!-- EMPTY STATE -->
+
+    <div class="bookings-empty-state">
+
+        <div class="bookings-empty-icon">
+            📅
+        </div>
+
+        <h3>
+            No bookings yet
+        </h3>
+
+        <p>
+            Your customer appointments and
+            service bookings will appear here.
+        </p>
+
+        <a
+            href="{{ url_for(
+                'new_booking',
+                business_id=business._id
+            ) }}"
+            class="booking-secondary-button"
+        >
+            + Create First Booking
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <img
+            src="{{ url_for('static',
+                            filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+    <script>
+    const statusFilter = document.getElementById("statusFilter");
+    const bookingRows = document.querySelectorAll(".bookings-table tbody tr");
+    const dateFilter = document.getElementById("dateFilter");
+    const startDate = document.getElementById("startDate");
+    const endDate = document.getElementById("endDate");
+    const sortBookings = document.getElementById("sortBookings");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
+    const pageInfo = document.getElementById("pageInfo");
+
+let currentPage = 1;
+const bookingsPerPage = 10;
+
+    statusFilter.addEventListener("change", function () {
+
+        const selectedStatus = this.value;
+
+        bookingRows.forEach(function (row) {
+
+            const statusElement = row.querySelector(".booking-status");
+
+            if (!statusElement) {
+                return;
+            }
+
+            const bookingStatus = statusElement.textContent.trim();
+
+            if (
+                selectedStatus === "all" ||
+                bookingStatus === selectedStatus
+            ) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+
+        });
+
+    });
+
+    const bookingSearch = document.getElementById("bookingSearch");
+
+function filterBookings() {
+    const selectedStatus = statusFilter.value;
+    const searchTerm = bookingSearch.value.toLowerCase().trim();
+    const selectedDate = dateFilter.value;
+
+    bookingRows.forEach(function (row) {
+        const statusElement = row.querySelector(".booking-status");
+        const dateElement = row.querySelector(".booking-date");
+
+        if (!statusElement || !dateElement) {
+            return;
+        }
+
+        const bookingStatus = statusElement.textContent.trim();
+        const rowText = row.textContent.toLowerCase();
+
+        const matchesStatus =
+            selectedStatus === "all" ||
+            bookingStatus === selectedStatus;
+
+        const matchesSearch =
+            rowText.includes(searchTerm);
+
+        let matchesDate = true;
+
+        const bookingDate = new Date(dateElement.dataset.date);
+        const today = new Date();
+
+        if (selectedDate === "today") {
+            matchesDate =
+                bookingDate.toDateString() === today.toDateString();
+        }
+
+        if (selectedDate === "week") {
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(
+                today.getDate() - today.getDay()
+            );
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(
+                startOfWeek.getDate() + 6
+            );
+            endOfWeek.setHours(23, 59, 59, 999);
+
+            matchesDate =
+                bookingDate >= startOfWeek &&
+                bookingDate <= endOfWeek;
+        }
+
+        if (selectedDate === "month") {
+            matchesDate =
+                bookingDate.getMonth() === today.getMonth() &&
+                bookingDate.getFullYear() === today.getFullYear();
+        }
+
+        if (selectedDate === "previous-month") {
+
+    const previousMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        1
+    );
+
+    const previousMonthNumber = previousMonth.getMonth();
+    const previousMonthYear = previousMonth.getFullYear();
+
+    matchesDate =
+        bookingDate.getMonth() === previousMonthNumber &&
+        bookingDate.getFullYear() === previousMonthYear;
+}
+
+        if (startDate.value && endDate.value) {
+
+    const selectedStartDate = new Date(startDate.value);
+    const selectedEndDate = new Date(endDate.value);
+
+    selectedStartDate.setHours(0, 0, 0, 0);
+    selectedEndDate.setHours(23, 59, 59, 999);
+
+    matchesDate =
+        bookingDate >= selectedStartDate &&
+        bookingDate <= selectedEndDate;
+}
+
+        if (
+            matchesStatus &&
+            matchesSearch &&
+            matchesDate
+        ) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+
+function sortBookingRows() {
+    const tbody = document.querySelector(".bookings-table tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const sortValue = sortBookings.value;
+
+    rows.sort(function (a, b) {
+
+        const dateA = new Date(
+            a.querySelector(".booking-date").dataset.date
+        );
+
+        const dateB = new Date(
+            b.querySelector(".booking-date").dataset.date
+        );
+
+        const amountA = parseFloat(
+            a.cells[4].textContent.replace(/[^0-9.]/g, "")
+        );
+
+        const amountB = parseFloat(
+            b.cells[4].textContent.replace(/[^0-9.]/g, "")
+        );
+
+        if (sortValue === "newest") {
+            return dateB - dateA;
+        }
+
+        if (sortValue === "oldest") {
+            return dateA - dateB;
+        }
+
+        if (sortValue === "amount-high") {
+            return amountB - amountA;
+        }
+
+        if (sortValue === "amount-low") {
+            return amountA - amountB;
+        }
+
+        return 0;
+    });
+
+    rows.forEach(function (row) {
+        tbody.appendChild(row);
+    });
+}
+
+function showPage() {
+    const rows = Array.from(
+        document.querySelectorAll(".bookings-table tbody tr")
+    );
+
+    const totalPages = Math.ceil(rows.length / bookingsPerPage);
+
+    if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+    }
+
+    const start = (currentPage - 1) * bookingsPerPage;
+    const end = start + bookingsPerPage;
+
+    rows.forEach(function (row, index) {
+        if (index >= start && index < end) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+    pageInfo.textContent =
+        "Page " + currentPage + " of " + Math.max(totalPages, 1);
+
+    prevPage.disabled = currentPage === 1;
+    nextPage.disabled = currentPage >= totalPages;
+}
+
+prevPage.addEventListener("click", function () {
+    if (currentPage > 1) {
+        currentPage--;
+        showPage();
+    }
+});
+
+nextPage.addEventListener("click", function () {
+    const rows = document.querySelectorAll(
+        ".bookings-table tbody tr"
+    );
+
+    const totalPages = Math.ceil(
+        rows.length / bookingsPerPage
+    );
+
+    if (currentPage < totalPages) {
+        currentPage++;
+        showPage();
+    }
+});
+
+statusFilter.addEventListener("change", filterBookings);
+
+bookingSearch.addEventListener("input", filterBookings);
+dateFilter.addEventListener("change", filterBookings);
+startDate.addEventListener("change", filterBookings);
+endDate.addEventListener("change", filterBookings);
+sortBookings.addEventListener("change", sortBookingRows);
+showPage();
+</script>
+
+</body>
+
+</html>

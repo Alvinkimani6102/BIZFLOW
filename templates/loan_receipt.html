@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Receipt | BIZFLOW</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 25px 15px;
+        }
+
+        .receipt {
+            max-width: 750px;
+            margin: auto;
+            padding: 35px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px #0000000d;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #176b52;
+            margin-bottom: 5px;
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .detail {
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .detail small {
+            display: block;
+            color: #64748b;
+            margin-bottom: 7px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            padding: 11px 7px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .totals {
+            max-width: 350px;
+            margin: 20px 0 0 auto;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .balance {
+            color: #b42318;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .actions {
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        button, .back {
+            display: inline-block;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 7px;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 4px;
+        }
+
+        button {
+            background: #176b52;
+            color: white;
+        }
+
+        .back {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            border-top: 2px dashed #cbd5e1;
+            padding-top: 18px;
+            margin-top: 30px;
+            font-size: 12px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .receipt {
+                box-shadow: none;
+                padding: 10px;
+            }
+
+            .actions {
+                display: none;
+            }
+
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .receipt {
+                padding: 18px 12px;
+            }
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="receipt">
+    <header class="header">
+        <h1>BIZFLOW</h1>
+        <p>Customer Loan Receipt</p>
+        <small>Manage • Track • Grow</small>
+    </header>
+
+    <section class="section">
+        <h3>Customer and Loan Details</h3>
+
+        <div class="details">
+            <div class="detail">
+                <small>Customer</small>
+                <strong>{{ loan.get("customer_name") or "Unnamed customer" }}</strong>
+            </div>
+
+            <div class="detail">
+                <small>Business</small>
+                <strong>{{ business.get("name", "BIZFLOW Business") }}</strong>
+            </div>
+
+            <div class="detail">
+                <small>Receipt Reference</small>
+                <strong>{{ loan.get("reference", "N/A") }}</strong>
+            </div>
+
+            <div class="detail">
+                <small>Date of Sale</small>
+                <strong>
+                    {% if loan.get("created_at") %}
+                        {{ loan.get("created_at").strftime("%d %b %Y, %I:%M %p") }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="detail">
+                <small>Payment Status</small>
+                <strong>{{ loan.get("payment_status", "Unpaid") }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h3>Products Purchased</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="right">Quantity</th>
+                    <th class="right">Unit Price</th>
+                    <th class="right">Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in loan.get("items", []) %}
+                {% set qty = item.get("quantity", 0)|float %}
+                {% set price = item.get("selling_price", item.get("unit_price", item.get("price", 0)))|float %}
+                <tr>
+                    <td>{{ item.get("name", item.get("product_name", "Product")) }}</td>
+                    <td class="right">{{ item.get("quantity", 0) }}</td>
+                    <td class="right">KSh {{ "{:,.2f}".format(price) }}</td>
+                    <td class="right">
+                        KSh {{ "{:,.2f}".format(item.get("subtotal", qty * price)|float) }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No product details recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <div class="total-row">
+                <span>Original Loan</span>
+                <strong>KSh {{ "{:,.2f}".format(loan.get("total", 0)|float) }}</strong>
+            </div>
+
+            <div class="total-row">
+                <span>Total Repaid</span>
+                <strong>KSh {{ "{:,.2f}".format(loan.get("amount_paid", 0)|float) }}</strong>
+            </div>
+
+            <div class="total-row balance">
+                <span>Balance Due</span>
+                <strong>KSh {{ "{:,.2f}".format(loan.get("balance", 0)|float) }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h3>Repayment History</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Payment Method</th>
+                    <th class="right">Amount</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for payment in loan.get("payments", []) %}
+                <tr>
+                    <td>
+                        {% if payment.get("paid_at") %}
+                            {{ payment.get("paid_at").strftime("%d %b %Y, %I:%M %p") }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ payment.get("payment_method", "N/A") }}</td>
+                    <td class="right">
+                        KSh {{ "{:,.2f}".format(payment.get("amount", 0)|float) }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3">No repayments recorded yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <footer class="footer">
+        <p><strong>Thank you.</strong></p>
+        <p>This receipt records the customer's loan and repayments.</p>
+        <p>Generated by BIZFLOW</p>
+    </footer>
+</div>
+
+<div class="actions">
+    <button onclick="window.print()">Print / Save as PDF</button>
+
+    <a class="back"
+       href="{{ url_for('business_loans', business_id=business._id) }}">
+        Back to Loans
+    </a>
+</div>
+
+</body>
+</html>

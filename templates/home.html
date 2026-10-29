@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BIZFLOW | Business Management Platform</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATION
+    ========================== -->
+
+    <header class="navbar">
+
+        <!-- BIZFLOW LOGO -->
+
+        <a href="/" class="brand">
+
+            <img
+                src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+                alt="BIZFLOW Logo"
+            >
+
+        </a>
+
+
+        <!-- NAVIGATION LINKS -->
+
+        <nav>
+
+            <a href="/">Home</a>
+
+            <a href="#features">Features</a>
+
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+
+            <a href="{{ url_for('login') }}" class="login-link">
+                Login
+            </a>
+
+            <a href="/signup" class="signup-button">
+                Get Started
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- =========================
+         HERO SECTION
+    ========================== -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="welcome-text">
+                WELCOME TO BIZFLOW
+            </p>
+
+            <h1>
+                Manage Your Business.
+                <span>Grow With Confidence.</span>
+            </h1>
+
+            <p class="hero-description">
+
+                BIZFLOW is a modern business management platform
+                designed to help you manage products, sales,
+                expenses, inventory and business performance
+                from one powerful platform.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a href="/signup" class="primary-button">
+                    Get Started
+                </a>
+
+                <a href="#features" class="secondary-button">
+                    Explore BIZFLOW
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         FEATURES
+    ========================== -->
+
+    <section class="features" id="features">
+
+        <h2>
+            Everything Your Business Needs
+        </h2>
+
+        <p class="section-description">
+
+            Manage your business operations from one
+            simple and powerful platform.
+
+        </p>
+
+
+        <div class="feature-container">
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📦
+                </div>
+
+                <h3>
+                    Inventory
+                </h3>
+
+                <p>
+
+                    Keep track of products, quantities,
+                    buying prices, selling prices and
+                    stock levels.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    💰
+                </div>
+
+                <h3>
+                    Sales
+                </h3>
+
+                <p>
+
+                    Record sales and monitor your
+                    business revenue in one place.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📊
+                </div>
+
+                <h3>
+                    Reports
+                </h3>
+
+                <p>
+
+                    Understand your revenue,
+                    expenses and profit through
+                    useful reports.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🏢
+                </div>
+
+                <h3>
+                    Multiple Businesses
+                </h3>
+
+                <p>
+
+                    Manage multiple private businesses
+                    from a single BIZFLOW account.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         ABOUT
+    ========================== -->
+
+    <section class="about" id="about">
+
+        <div class="about-content">
+
+            <h2>
+                One Account. Multiple Businesses.
+            </h2>
+
+            <p>
+
+                BIZFLOW allows a user to create and manage
+                multiple businesses from one account while
+                keeping each business and its information
+                private and secure.
+
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    
+    <!-- =========================
+         CONTACT BIZFLOW
+    ========================== -->
+
+    <section class="contact-section" id="contact">
+
+        <div class="contact-content">
+
+            <p class="welcome-text">GET IN TOUCH</p>
+
+            <h2>Contact BIZFLOW</h2>
+
+            <p class="section-description">
+                Have questions about BIZFLOW or need assistance
+                with your account? Contact us through any of
+                the channels below.
+            </p>
+
+            <div class="contact-container">
+
+                <a href="https://wa.me/254729005965"
+                   class="contact-card"
+                   target="_blank"
+                   rel="noopener noreferrer">
+
+                    <div class="feature-icon">💬</div>
+                    <h3>WhatsApp</h3>
+                    <p>0729005965</p>
+
+                </a>
+
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=kimanialvin2003%40gmail.com"
+   class="contact-card"
+   target="_blank"
+   rel="noopener noreferrer">
+
+                    <div class="feature-icon">✉️</div>
+                    <h3>Email Us</h3>
+                     <p>kimanialvin2003@gmail.com</p>
+
+                </a>
+
+                <a href="tel:+254729005965"
+                   class="contact-card">
+
+                    <div class="feature-icon">📞</div>
+                    <h3>Call Us</h3>
+                    <p>0729005965</p>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW"
+            class="footer-logo"
+        >
+
+        <p>
+            © 2026 BIZFLOW. All rights reserved.
+        </p>
+
+        <p class="footer-tagline">
+            Manage • Track • Grow
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

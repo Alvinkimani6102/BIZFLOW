@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports & Analytics - {{ business.name }}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+          
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container reports-page">
+
+        <h1>Reports & Analytics</h1>
+
+        <p>
+            Business:
+            <strong>{{ business.name }}</strong>
+        </p>
+
+        <p class="reports-description">
+            Monitor your sales performance and gross profit.
+        </p>
+
+        <hr>
+
+        <!-- Daily Report -->
+        <section class="report-section">
+            <h2>Today's Performance</h2>
+
+            <div class="report-grid">
+
+                <div class="report-card">
+                    <h3>Revenue</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(today_revenue) }}
+                    </p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Cost of Goods</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(today_cost) }}
+                    </p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Gross Profit</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(today_profit) }}
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Weekly Report -->
+        <section class="report-section">
+            <h2>This Week</h2>
+
+            <div class="report-grid">
+
+                <div class="report-card">
+                    <h3>Revenue</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(weekly_revenue) }}
+                    </p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Cost of Goods</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(weekly_cost) }}
+                    </p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Gross Profit</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(weekly_profit) }}
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Monthly Report -->
+        <section class="report-section">
+            <h2>This Month</h2>
+
+            <div class="report-grid">
+
+                <div class="report-card">
+                    <h3>Revenue</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(monthly_revenue) }}
+                    </p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Cost of Goods</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(monthly_cost) }}
+                    </p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Gross Profit</h3>
+                    <p class="report-amount">
+                        KSh {{ "%.2f"|format(monthly_profit) }}
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        
+<!-- Advanced performance analytics -->
+<section class="report-section">
+    <h2>Sales Trends — Last 30 Days</h2>
+
+    <p class="reports-description">
+        Compare daily revenue with gross profit for this business.
+    </p>
+
+    <div class="analytics-chart-card">
+        <canvas id="salesTrendChart"></canvas>
+    </div>
+</section>
+
+<section class="report-section">
+    <h2>Best-Selling Products — Last 30 Days</h2>
+
+    <p class="reports-description">
+        Products are ranked by the total quantity sold.
+    </p>
+
+    {% if best_sellers %}
+        <div class="analytics-chart-card">
+            <canvas id="bestSellersChart"></canvas>
+        </div>
+
+        <div class="history-table-wrapper">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Product</th>
+                        <th>Quantity Sold</th>
+                        <th>Revenue</th>
+                        <th>Gross Profit</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for product in best_sellers %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ "%.2f"|format(product.quantity) }}</td>
+                        <td>
+                            KSh {{ "%.2f"|format(product.revenue) }}
+                        </td>
+                        <td>
+                            KSh {{ "%.2f"|format(product.profit) }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="analytics-empty">
+            <h3>No product sales to analyse yet</h3>
+            <p>Once completed sales are recorded, your best-selling products will appear here.</p>
+        </div>
+    {% endif %}
+</section>
+
+<section class="report-section">
+    <h2>Sales Activity</h2>
+
+    <div class="report-grid">
+        <div class="report-card">
+            <h3>Transactions in the Last 30 Days</h3>
+            <p class="report-amount">{{ total_sales_30_days }}</p>
+        </div>
+
+        <div class="report-card">
+            <h3>Products Ranked</h3>
+            <p class="report-amount">{{ best_sellers|length }}</p>
+        </div>
+    </div>
+</section>
+
+
+        <p class="reports-note">
+            Gross profit = sales revenue − cost of goods sold.
+            Operating expenses are not deducted yet.
+        </p>
+
+        <a class="back-link"
+           href="{{ url_for('business_workspace',
+                            business_id=business._id) }}">
+            ← Back to Business Workspace
+        </a>
+
+    </div>
+
+    
+<script>
+    // Daily sales and gross-profit trend
+    const trendLabels = {{ trend_labels | default([], true) | tojson }};
+    const trendRevenue = {{ trend_revenue | default([], true) | tojson }};
+    const trendProfit = {{ trend_profit | default([], true) | tojson }};
+
+    const trendCanvas = document.getElementById("salesTrendChart");
+
+    if (trendCanvas) {
+        new Chart(trendCanvas, {
+            type: "line",
+            data: {
+                labels: trendLabels,
+                datasets: [
+                    {
+                        label: "Revenue (KSh)",
+                        data: trendRevenue,
+                        tension: 0.3,
+                        borderWidth: 3
+                    },
+                    {
+                        label: "Gross Profit (KSh)",
+                        data: trendProfit,
+                        tension: 0.3,
+                        borderWidth: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: "index"
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Amount (KSh)"
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Rank the top five products by quantity sold
+    const bestSellerLabels = {{ best_sellers | default([], true) | map(attribute="name") | list | tojson }};
+    const bestSellerQuantities = {{ best_sellers | default([], true) | map(attribute="quantity") | list | tojson }};
+
+    const bestSellerCanvas = document.getElementById("bestSellersChart");
+
+    if (bestSellerCanvas && bestSellerLabels.length > 0) {
+        new Chart(bestSellerCanvas, {
+            type: "bar",
+            data: {
+                labels: bestSellerLabels,
+                datasets: [{
+                    label: "Quantity Sold",
+                    data: bestSellerQuantities,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Quantity Sold"
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+
+</body>
+</html>

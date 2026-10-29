@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ category.name }} | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a href="/dashboard" class="brand">
+        <img
+            src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+            alt="BIZFLOW Logo"
+        >
+    </a>
+
+    <nav>
+
+        <a href="{{ url_for('products',
+                            business_id=business._id) }}">
+            Products
+        </a>
+
+        <a href="{{ url_for('business_workspace',
+                            business_id=business._id) }}">
+            Business
+        </a>
+
+        <a href="/logout" class="signup-button">
+            Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="category-workspace-page">
+
+    <div class="category-workspace-container">
+
+        <!-- BREADCRUMB -->
+
+        <div class="category-breadcrumb">
+
+            <a href="{{ url_for('products',
+                                business_id=business._id) }}">
+                Products
+            </a>
+
+            <span>›</span>
+
+            <span>{{ category.name }}</span>
+
+        </div>
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="category-page-header">
+
+            <div class="category-page-title">
+
+                <div class="category-large-icon">
+                    📂
+                </div>
+
+                <div>
+
+                    <p class="workspace-label">
+                        {{ business.name }}
+                    </p>
+
+                    <h1>
+                        {{ category.name }}
+                    </h1>
+
+                    <p>
+                        Manage products in this category.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('create_product_in_category',
+                                business_id=business._id,
+                                category_id=category._id) }}"
+                class="category-create-button"
+            >
+                + Create Product
+            </a>
+
+        </div>
+
+
+        <!-- CATEGORY SUMMARY -->
+
+        <div class="category-summary">
+
+            <div class="category-summary-card">
+
+                <div class="summary-icon">
+                    📦
+                </div>
+
+                <div>
+
+                    <span>
+                        Products
+                    </span>
+
+                    <strong>
+                        {{ products|length }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="category-summary-card">
+
+                <div class="summary-icon">
+                    🏷️
+                </div>
+
+                <div>
+
+                    <span>
+                        Category
+                    </span>
+
+                    <strong>
+                        {{ category.name }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PRODUCTS SECTION -->
+
+        <section class="category-products-section">
+
+            <div class="products-section-heading">
+
+                <div>
+
+                    <h2>
+                        Products
+                    </h2>
+
+                    <p>
+                        Products currently belonging to
+                        {{ category.name }}.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if products %}
+
+                <div class="professional-products-grid">
+
+                    {% for product in products %}
+
+                        <article class="professional-product-card">
+
+                            <!-- PRODUCT HEADER -->
+
+                            <div class="professional-product-header">
+
+                                <div class="product-icon">
+                                    📦
+                                </div>
+
+                                <div class="product-title-area">
+
+                                    <h3>
+    <a
+        href="{{ url_for(
+            'view_product',
+            business_id=business._id,
+            product_id=product._id
+        ) }}"
+        class="category-product-title-link"
+    >
+        {{ product.name }}
+    </a>
+</h3>
+
+                                    {% if product.sku %}
+
+                                        <p>
+                                            SKU:
+                                            <strong>
+                                                {{ product.sku }}
+                                            </strong>
+                                        </p>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- DESCRIPTION -->
+
+                            {% if product.description %}
+
+                                <p class="professional-product-description">
+                                    {{ product.description }}
+                                </p>
+
+                            {% endif %}
+
+
+                            <!-- STOCK -->
+
+                            <div class="product-stock-box">
+
+                                <div>
+
+                                    <span>
+                                        Available Stock
+                                    </span>
+
+                                    <strong>
+                                        {{ product.quantity }}
+                                    </strong>
+
+                                </div>
+
+                                <small>
+                                    {{ product.measurement_type|default("Piece") }}
+                                </small>
+
+                            </div>
+
+
+                            <!-- PRICES -->
+
+                            <div class="product-pricing">
+
+                                <div>
+
+                                    <span>
+                                        Buying Price
+                                    </span>
+
+                                    <strong>
+                                        KSh {{ "%.2f"|format(product.buying_price|default(0)) }}
+                                    </strong>
+
+                                    <small>
+                                        per {{ product.measurement_type|default("unit") }}
+                                    </small>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Selling Price
+                                    </span>
+
+                                    <strong>
+                                        KSh {{ "%.2f"|format(product.selling_price|default(0)) }}
+                                    </strong>
+
+                                    <small>
+                                        per {{ product.measurement_type|default("unit") }}
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- EXPECTED PROFIT -->
+
+                            <div class="product-profit">
+
+                                <span>
+                                    Expected Profit / Unit
+                                </span>
+
+                                <strong>
+                                    KSh {{
+                                        "%.2f"|format(
+                                            (product.selling_price|default(0))
+                                            -
+                                            (product.buying_price|default(0))
+                                        )
+                                    }}
+                                </strong>
+
+                            </div>
+
+
+                            <!-- STOCK STATUS -->
+
+                            {% set quantity = product.quantity|default(0)|float %}
+                            {% set threshold = product.low_stock_threshold|default(0)|float %}
+
+                            <div class="product-status-row">
+
+                                {% if quantity <= 0 %}
+
+                                    <span class="stock-status out-of-stock">
+                                        ● OUT OF STOCK
+                                    </span>
+
+                                {% elif quantity <= threshold %}
+
+                                    <span class="stock-status low-stock">
+                                        ● LOW STOCK
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="stock-status in-stock">
+                                        ● IN STOCK
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                            
+<!-- PRODUCT ACTIONS -->
+
+<div class="category-product-actions">
+
+    <a
+        href="{{ url_for(
+            'view_product',
+            business_id=business._id,
+            product_id=product._id
+        ) }}"
+        class="category-product-action"
+    >
+        View
+    </a>
+
+    <a
+        href="{{ url_for(
+            'edit_product',
+            business_id=business._id,
+            product_id=product._id
+        ) }}"
+        class="category-product-action"
+    >
+        Edit
+    </a>
+
+    <a
+        href="{{ url_for(
+            'restock_product',
+            business_id=business._id,
+            product_id=product._id
+        ) }}"
+        class="category-product-action"
+    >
+        Restock
+    </a>
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'delete_product',
+            business_id=business._id,
+            product_id=product._id
+        ) }}"
+        onsubmit="return confirm('Are you sure you want to delete this product?');"
+    >
+        <button type="submit" class="category-product-delete">
+            Delete
+        </button>
+    </form>
+
+</div>
+
+
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <!-- EMPTY STATE -->
+
+                <div class="professional-empty-products">
+
+                    <div class="professional-empty-icon">
+                        📦
+                    </div>
+
+                    <h3>
+                        No products yet
+                    </h3>
+
+                    <p>
+                        This category does not have any products yet.
+                        Create your first product to start managing
+                        inventory.
+                    </p>
+
+                    <a
+                        href="{{ url_for('create_product_in_category',
+                                        business_id=business._id,
+                                        category_id=category._id) }}"
+                        class="category-create-button"
+                    >
+                        + Create Product
+                        
+
+                        
+                    </a>
+
+                    
+
+                    
+
+                    
+
+                </div>
+
+            {% endif %}
+
+            
+<form
+    method="POST"
+    action="{{ url_for(
+        'delete_category',
+        business_id=business._id,
+        category_id=category._id
+    ) }}"
+    onsubmit="return confirm('Are you sure you want to delete this category? This action cannot be undone.');"
+>
+    <button type="submit" class="delete-category-button">
+        Delete Category
+    </button>
+</form>
+
+
+        </section>
+
+
+        <!-- BACK -->
+
+        <div class="category-back-link">
+
+            <a href="{{ url_for('create_product',
+                                business_id=business._id) }}">
+                ← Back to Categories
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <img
+        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        alt="BIZFLOW"
+        class="footer-logo"
+    >
+
+    <p>
+        © 2026 BIZFLOW. All rights reserved.
+    </p>
+
+    <p class="footer-tagline">
+        Manage • Track • Grow
+    </p>
+
+</footer>
+
+</body>
+
+</html>

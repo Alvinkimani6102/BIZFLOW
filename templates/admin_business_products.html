@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Products | {{ business.name }} | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .admin-products-container {
+            max-width: 1400px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .admin-products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .admin-products-header h1 {
+            margin: 0 0 8px;
+            color: #0f172a;
+        }
+
+        .admin-products-header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .admin-products-button {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #1d4ed8;
+            color: white;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .admin-products-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .admin-products-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .admin-products-table {
+            width: 100%;
+            min-width: 950px;
+            border-collapse: collapse;
+        }
+
+        .admin-products-table th,
+        .admin-products-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .admin-products-table th {
+            background: #f8fafc;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        .admin-products-table td {
+            color: #334155;
+        }
+
+        .admin-products-empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: #64748b;
+        }
+
+        .admin-products-count {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 6px 10px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .admin-products-container {
+                margin: 15px auto;
+                padding: 12px;
+            }
+
+            .admin-products-card {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="brand">
+        <a href="{{ url_for('admin_panel') }}"
+           style="text-decoration:none;color:inherit;">
+            BIZFLOW
+        </a>
+    </div>
+</header>
+
+<main class="admin-products-container">
+
+    <div class="admin-products-header">
+        <div>
+            <h1>Business Products</h1>
+            <p>
+                Business: <strong>{{ business.name }}</strong>
+            </p>
+            <p style="margin-top:6px;">
+                Administrator view — records are read-only.
+            </p>
+        </div>
+
+        <a class="admin-products-button"
+           href="{{ url_for('admin_panel', user_id=business.owner_id) }}">
+            ← Back to Admin Panel
+        </a>
+    </div>
+
+    <section class="admin-products-card">
+
+        <span class="admin-products-count">
+            Products found: {{ products_list|length }}
+        </span>
+
+        {% if products_list %}
+
+        <div class="admin-products-table-wrapper">
+            <table class="admin-products-table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Buying Price</th>
+                        <th>Selling Price</th>
+                        <th>Available Stock</th>
+                        <th>Stock Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for product in products_list %}
+                    <tr>
+                        <td>
+                            <strong>
+                                {{ product.get('name', 'Unnamed product') }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ product.get('category', '—') }}
+                        </td>
+
+                        <td>
+                            {{ product.get('description', '—') or '—' }}
+                        </td>
+
+                        <td>
+                            KSh {{ "%.2f"|format(product.get('buying_price', 0) or 0) }}
+                        </td>
+
+                        <td>
+                            KSh {{ "%.2f"|format(product.get('selling_price', 0) or 0) }}
+                        </td>
+
+                        <td>
+                            {{ product.get('quantity', 0) }}
+                        </td>
+
+                        <td>
+                            {% set quantity = product.get('quantity', 0) or 0 %}
+                            {% set threshold = product.get('low_stock_threshold', 5) or 0 %}
+
+                            {% if quantity <= 0 %}
+                                <span style="color:#dc2626;font-weight:600;">
+                                    Out of stock
+                                </span>
+                            {% elif quantity <= threshold %}
+                                <span style="color:#d97706;font-weight:600;">
+                                    Low stock
+                                </span>
+                            {% else %}
+                                <span style="color:#15803d;font-weight:600;">
+                                    In stock
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+
+        <div class="admin-products-empty">
+            <h3>No products found</h3>
+            <p>This business does not have any matching product records yet.</p>
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+</body>
+</html>

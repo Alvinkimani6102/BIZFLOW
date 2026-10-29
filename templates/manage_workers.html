@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Workers | BIZFLOW</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            background: #f4f7fb;
+            color: #172033;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+        }
+
+        .header, .panel {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 22px;
+            box-shadow: 0 5px 20px rgba(20, 35, 60, .06);
+        }
+
+        h1 { margin-top: 0; font-size: 27px; }
+        h2 { font-size: 20px; }
+
+        .muted { color: #667085; line-height: 1.6; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d5dce7;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            border: 0;
+            background: #2457d6;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            background: #fff0f0;
+            color: #a32121;
+        }
+
+        .worker {
+            padding: 15px 0;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .worker:last-child { border-bottom: 0; }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #2457d6;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; gap: 0; }
+            .header, .panel { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <a class="back"
+       href="{{ url_for('business_workspace', business_id=business['_id']) }}">
+        ← Back to business
+    </a>
+
+    <section class="header">
+        <h1>Worker Management</h1>
+        <p class="muted">
+            Business: <strong>{{ business['name'] }}</strong>
+        </p>
+        <p class="muted">
+            Create a separate login for a worker assigned to this business.
+            Worker access will be restricted to permitted tasks.
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>Create a worker account</h2>
+
+        {% if error %}
+            <div class="message">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <div class="form-grid">
+                <div>
+                    <label for="name">Worker's full name</label>
+                    <input id="name" name="name"
+                           value="{{ request.form.get('name', '') }}"
+                           required>
+                </div>
+
+                <div>
+                    <label for="email">Worker's email</label>
+                    <input id="email" name="email" type="email"
+                           value="{{ request.form.get('email', '') }}"
+                           required>
+                </div>
+
+                <div>
+                    <label for="password">Temporary password</label>
+                    <input id="password" name="password"
+                           type="password" minlength="8" required>
+                </div>
+
+                <div>
+                    <label for="confirm_password">Confirm password</label>
+                    <input id="confirm_password"
+                           name="confirm_password"
+                           type="password" minlength="8" required>
+                </div>
+            </div>
+
+            <button type="submit">Create worker account</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Workers assigned to this business</h2>
+
+        {% if workers %}
+            {% for worker in workers %}
+                <div class="worker">
+                    <strong>{{ worker.name }}</strong><br>
+                    <span class="muted">{{ worker.email }}</span>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="muted">
+                No workers have been assigned to this business yet.
+            </p>
+        {% endif %}
+    </section>
+
+</div>
+</body>
+</html>

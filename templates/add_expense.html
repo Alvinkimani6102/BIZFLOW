@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Expense | BIZFLOW</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .form-page{max-width:760px;margin:35px auto;padding:20px}
+        .form-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px;box-shadow:0 8px 25px #0f172a0a}
+        .form-page h1{color:#172554;margin-bottom:8px}
+        .form-subtitle{color:#64748b;margin-top:0;margin-bottom:25px}
+        .expense-form{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+        .expense-form .full{grid-column:1/-1}
+        .expense-form label{display:block;font-weight:600;color:#334155;margin-bottom:7px}
+        .expense-form input,.expense-form select,.expense-form textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}
+        .expense-form textarea{min-height:100px;resize:vertical}
+        .form-actions{display:flex;gap:12px;align-items:center;margin-top:24px;flex-wrap:wrap}
+        .form-btn{border:0;border-radius:9px;padding:12px 18px;background:#2563eb;color:#fff;font-weight:600;cursor:pointer;text-decoration:none;font:inherit}
+        .form-btn.secondary{background:#e2e8f0;color:#1e293b}
+        .form-back{display:inline-block;margin-bottom:20px;color:#2563eb;text-decoration:none}
+        @media(max-width:600px){.form-page{padding:12px;margin:15px auto}.form-card{padding:19px}.expense-form{grid-template-columns:1fr}.expense-form .full{grid-column:auto}}
+    </style>
+</head>
+<body>
+<div class="form-page">
+    <a class="form-back" href="{{ url_for('expenses', business_id=business._id) }}">← Back to Expenses</a>
+    <div class="form-card">
+        <h1>Record an Expense</h1>
+        <p class="form-subtitle">Add a spending record for {{ business.name }}.</p>
+
+        <form method="POST">
+            <div class="expense-form">
+                <div>
+                    <label for="name">Expense name *</label>
+                    <input id="name" name="name" type="text" maxlength="120" required placeholder="e.g. Shop rent">
+                </div>
+                <div>
+                    <label for="category">Category *</label>
+                    <input id="category" name="category" type="text" maxlength="80" required list="expense-categories" placeholder="e.g. Rent">
+                    <datalist id="expense-categories">
+                        <option value="Rent">
+                        <option value="Transport">
+                        <option value="Utilities">
+                        <option value="Stock purchases">
+                        <option value="Salaries">
+                        <option value="Marketing">
+                        <option value="Internet">
+                        <option value="Maintenance">
+                        <option value="Other">
+                    </datalist>
+                </div>
+                <div>
+                    <label for="amount">Amount (KSh) *</label>
+                    <input id="amount" name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00">
+                </div>
+                <div>
+                    <label for="expense_date">Expense date *</label>
+                    <input id="expense_date" name="expense_date" type="date" required>
+                </div>
+                <div class="full">
+                    <label for="payment_method">Payment method</label>
+                    <select id="payment_method" name="payment_method">
+                        <option value="">Select payment method</option>
+                        <option value="Cash">Cash</option>
+                        <option value="M-Pesa">M-Pesa</option>
+                        <option value="Bank Transfer">Bank transfer</option>
+                        <option value="Card">Card</option>
+                        <option value="Credit">Credit</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="full">
+                    <label for="description">Description / Notes</label>
+                    <textarea id="description" name="description" maxlength="1000" placeholder="Add any useful details about this expense..."></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="form-btn" type="submit">Save Expense</button>
+                <a class="form-btn secondary" href="{{ url_for('expenses', business_id=business._id) }}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
