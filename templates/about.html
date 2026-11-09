@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>About BIZFLOW | Business Management Platform</title>
+
+    <meta name="description"
+          content="Discover BIZFLOW, a business management platform helping businesses manage products, services, sales, stock, bookings and finances.">
+
+    <link rel="icon" type="image/png"
+          href="{{ url_for('static', filename='images/bizflow-logo.png') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="about-page">
+
+<header class="about-header">
+    <a href="{{ url_for('home') }}" class="about-brand">
+        <img src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+             alt="BIZFLOW Logo">
+        <span>BIZFLOW</span>
+    </a>
+
+    <nav class="about-nav">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}" class="active">About Us</a>
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('signup') }}" class="about-nav-button">
+            Get Started
+        </a>
+    </nav>
+</header>
+
+<main>
+
+    <!-- HERO SECTION -->
+    <section class="about-hero">
+        <div class="about-hero-content">
+            <span class="about-eyebrow">WELCOME TO BIZFLOW</span>
+
+            <h1>Smarter Business Management. Better Business Growth.</h1>
+
+            <p>
+                BIZFLOW is a business management platform designed to help
+                entrepreneurs and business owners organise their operations,
+                monitor performance and manage their businesses from one place.
+            </p>
+
+            <a href="{{ url_for('signup') }}" class="about-primary-button">
+                Get Started Today
+            </a>
+        </div>
+    </section>
+
+
+    <!-- ABOUT SECTION -->
+    <section class="about-introduction">
+        <div class="about-section-heading">
+            <span class="about-eyebrow">WHO WE ARE</span>
+            <h2>About BIZFLOW</h2>
+        </div>
+
+        <p>
+            Running a business involves managing many activities.
+            BIZFLOW brings important business management tools together
+            in one platform, making everyday operations more organised
+            and easier to monitor.
+        </p>
+
+        <p>
+            From physical products to professional services,
+            BIZFLOW provides tools for managing sales, inventory,
+            customer bookings, expenses and business performance.
+        </p>
+    </section>
+
+
+    <!-- SERVICES / FEATURES -->
+    <section class="about-solutions">
+        <div class="about-section-heading">
+            <span class="about-eyebrow">WHAT WE OFFER</span>
+            <h2>Business Management Solutions</h2>
+            <p>Everything important to your business, organised in one place.</p>
+        </div>
+
+        <div class="about-feature-grid">
+
+            <article class="about-feature">
+                <h3>Product Management</h3>
+                <p>Manage products, pricing, stock levels and inventory.</p>
+            </article>
+
+            <article class="about-feature">
+                <h3>Sales Management</h3>
+                <p>Record transactions, generate receipts and monitor sales.</p>
+            </article>
+
+            <article class="about-feature">
+                <h3>Service Bookings</h3>
+                <p>Manage business services, customer appointments and bookings.</p>
+            </article>
+
+            <article class="about-feature">
+                <h3>Financial Tracking</h3>
+                <p>Monitor income, expenses, loans and repayments.</p>
+            </article>
+
+            <article class="about-feature">
+                <h3>Business Reports</h3>
+                <p>Understand business performance through organised reports.</p>
+            </article>
+
+            <article class="about-feature">
+                <h3>Team Management</h3>
+                <p>Manage workers and organise business operations.</p>
+            </article>
+
+        </div>
+    </section>
+
+
+    <!-- CEO SECTION -->
+    <section class="about-ceo">
+        <div class="about-ceo-image">
+            <img src="{{ url_for('static', filename='images/Ceo.jpeg') }}"
+                 alt="BIZFLOW Founder and Chief Executive Officer">
+        </div>
+
+        <div class="about-ceo-content">
+            <span class="about-eyebrow">LEADERSHIP</span>
+
+            <h2>Meet Our CEO</h2>
+
+            <h3>Alvin Kimani</h3>
+
+            <span class="about-ceo-position">
+                Founder & Chief Executive Officer
+            </span>
+
+            <p>
+                BIZFLOW was founded with a vision of making business
+                management more organised, accessible and efficient
+                through technology.
+            </p>
+
+            <p>
+                Our focus is on developing practical digital solutions
+                that help entrepreneurs and business owners manage
+                their daily operations and grow with confidence.
+            </p>
+        </div>
+    </section>
+
+
+    <!-- CALL TO ACTION -->
+    <section class="about-cta">
+        <h2>Take Your Business Management to the Next Level</h2>
+
+        <p>
+            Discover a simpler way to organise and manage your business
+            with BIZFLOW.
+        </p>
+
+        <a href="{{ url_for('signup') }}" class="about-primary-button">
+            Create Your Account
+        </a>
+    </section>
+
+</main>
+
+
+<footer class="about-footer">
+    <p>&copy; 2026 BIZFLOW. All rights reserved.</p>
+    <p>Business Management Made Simpler.</p>
+</footer>
+
+</body>
+</html>

@@ -54,8 +54,9 @@
 
             <a href="#features">Features</a>
 
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
+           <a href="#about">About</a>
+<a href="{{ url_for('about') }}">About BIZFLOW</a>
+<a href="#contact">Contact</a>
 
             <a href="{{ url_for('login') }}" class="login-link">
                 Login
@@ -71,48 +72,60 @@
 
 
 
-    <!-- =========================
-         HERO SECTION
-    ========================== -->
+<!-- =========================
+     HERO SECTION
+========================== -->
 
-    <section class="hero">
+<section class="hero hero-with-ceo">
 
-        <div class="hero-content">
+    <div class="hero-content">
 
-            <p class="welcome-text">
-                WELCOME TO BIZFLOW
-            </p>
+        <p class="welcome-text">
+            WELCOME TO BIZFLOW
+        </p>
 
-            <h1>
-                Manage Your Business.
-                <span>Grow With Confidence.</span>
-            </h1>
+        <h1>
+            Manage Your Business.
+            <span>Grow With Confidence.</span>
+        </h1>
 
-            <p class="hero-description">
+        <p class="hero-description">
+            BIZFLOW is a modern business management platform
+            designed to help you manage products, services,
+            sales, expenses, bookings and business performance
+            from one powerful platform.
+        </p>
 
-                BIZFLOW is a modern business management platform
-                designed to help you manage products, sales,
-                expenses, inventory and business performance
-                from one powerful platform.
+        <div class="hero-buttons">
 
-            </p>
+            <a href="/signup" class="primary-button">
+                Get Started
+            </a>
 
-
-            <div class="hero-buttons">
-
-                <a href="/signup" class="primary-button">
-                    Get Started
-                </a>
-
-                <a href="#features" class="secondary-button">
-                    Explore BIZFLOW
-                </a>
-
-            </div>
+            <a href="#features" class="secondary-button">
+                Explore BIZFLOW
+            </a>
 
         </div>
 
-    </section>
+    </div>
+
+    <div class="hero-ceo">
+
+        <img
+            src="{{ url_for('static', filename='images/Ceo.jpeg') }}"
+            alt="Alvin Kimani, Founder and CEO of BIZFLOW"
+        >
+
+        <div class="hero-ceo-caption">
+            <h3>Alvin Kimani</h3>
+            <p>Founder &amp; Chief Executive Officer</p>
+        </div>
+
+    </div>
+
+</section>
+
 
 
 
