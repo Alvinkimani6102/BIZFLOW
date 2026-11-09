@@ -123,7 +123,7 @@
 <header class="navbar">
     <a href="{% if session.get('role') == 'worker' %}{{ url_for('business_workspace', business_id=business._id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="brand">
     <img
-        src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+        src="{{ url_for('static', filename='images/bizflow-logo.webp') }}"
         alt="BIZFLOW Logo"
     >
 </a>
@@ -368,7 +368,7 @@
 </main>
 
 <footer>
-    <img src="{{ url_for('static', filename='images/bizflow-logo.png') }}"
+    <img src="{{ url_for('static', filename='images/bizflow-logo.webp') }}"
          alt="BIZFLOW" class="footer-logo">
 
     <p>© 2026 BIZFLOW. All rights reserved.</p>
