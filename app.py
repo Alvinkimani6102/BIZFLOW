@@ -291,8 +291,17 @@ def manage_workers(business_id):
 def home():
     return render_template("home.html")
 
-    # =========================
-# BIZFLOW XML SITEMAP
+
+# =========================
+# ABOUT BIZFLOW
+# =========================
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+# =========================
+# XML SITEMAP
 # =========================
 
 
@@ -300,14 +309,23 @@ def home():
 def sitemap():
 
     home_url = url_for("home", _external=True)
+    about_url = url_for("about", _external=True)
 
     sitemap_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
     <url>
         <loc>{home_url}</loc>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
+
+    <url>
+        <loc>{about_url}</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
 </urlset>
 """
 
