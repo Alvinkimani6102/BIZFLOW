@@ -35,6 +35,7 @@ def is_super_admin():
 
     return user is not None
 
+
 app = Flask(__name__)
 
 # Flask secret key
@@ -120,6 +121,7 @@ def is_business_owner(business_id):
     business, role = get_business_access(business_id)
     return business is not None and role == "owner"
 
+
 # Businesses collection
 businesses_collection = db["businesses"]
 
@@ -143,6 +145,7 @@ def maintenance_mode_enabled():
 # =========================
 # MAINTENANCE MODE PROTECTION
 # =========================
+
 
 @app.before_request
 def enforce_maintenance_mode():
@@ -280,7 +283,6 @@ def manage_workers(business_id):
     )
 
 
-
 # =========================
 # HOME PAGE
 # =========================
@@ -288,6 +290,31 @@ def manage_workers(business_id):
 @app.route("/")
 def home():
     return render_template("home.html")
+
+    # =========================
+# BIZFLOW XML SITEMAP
+# =========================
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+
+    home_url = url_for("home", _external=True)
+
+    sitemap_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{home_url}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+</urlset>
+"""
+
+    return app.response_class(
+        sitemap_xml,
+        mimetype="application/xml"
+    )
 
 
 # =========================
@@ -337,7 +364,6 @@ def signup():
     return render_template("signup.html")
 
 
-
 # =========================
 # ACCOUNT APPROVAL WAITING PAGE
 # =========================
@@ -345,8 +371,6 @@ def signup():
 @app.route("/account-pending")
 def account_pending():
     return render_template("account_pending.html")
-
-
 
 
 # =========================
@@ -366,15 +390,12 @@ def login():
             "email": email
         })
 
-       
         # Check credentials
         if user and check_password_hash(
             user.get("password_hash", ""),
             password
         ):
 
-            
-            
             # Require Super Admin approval for new accounts
             account_status = user.get("account_status", "active")
 
@@ -385,8 +406,7 @@ def login():
             if account_status != "active":
                 return render_template("account_deactivated.html"), 403
 
-            
-                        # Block non-admin users during maintenance
+                # Block non-admin users during maintenance
             if (
                 maintenance_mode_enabled()
                 and user.get("email", "").lower() != SUPER_ADMIN_EMAIL
@@ -395,7 +415,6 @@ def login():
 
             # Clear any previous login session
             session.clear()
-
 
             # Store user information in session
             session["user_id"] = str(user["_id"])
@@ -429,9 +448,9 @@ def login():
 
                 # Send workers directly to their assigned business workspace
                 return redirect(url_for(
-                  "business_workspace",
-                 business_id=str(business["_id"])
-                    ))
+                    "business_workspace",
+                    business_id=str(business["_id"])
+                ))
 
             # Business owner login, including the super administrator
             session["role"] = "owner"
@@ -445,7 +464,6 @@ def login():
 # =========================
 # ACCOUNT RECOVERY
 # =========================
-
 
 
 @app.route("/forgot-password", methods=["GET", "POST"])
@@ -514,12 +532,10 @@ def forgot_password():
 
     return render_template("forgot_password.html")
 
-
-
-
     # =========================
 # WORKER DASHBOARD
 # =========================
+
 
 @app.route("/worker-dashboard/<business_id>")
 def worker_dashboard(business_id):
@@ -580,7 +596,7 @@ def worker_dashboard(business_id):
             "$lte": end_utc
         }
     }))
-  
+
     today_sales_count = len(today_sales)
 
     today_revenue = sum(
@@ -596,8 +612,6 @@ def worker_dashboard(business_id):
         today_sales_count=today_sales_count,
         today_revenue=today_revenue
     )
-
-    
 
 
 # =========================
@@ -633,11 +647,10 @@ def dashboard():
         announcements=announcements
     )
 
-
-
     # =========================
 # SUPER ADMIN: RESET USER ACCOUNT DATA
 # =========================
+
 
 @app.route("/admin/reset-account", methods=["POST"])
 def admin_reset_account():
@@ -697,7 +710,7 @@ def admin_reset_account():
 
         ownership_filter = {
             "business_id": {"$in": business_ids}
-}
+        }
 
         collection.delete_many(ownership_filter)
 
@@ -705,11 +718,11 @@ def admin_reset_account():
     # This does not delete worker login accounts.
     business_memberships.delete_many({
         "business_id": {"$in": business_ids}
-        
+
     })
 
     # Delete only the selected user's business workspaces.
-        # Perform all business-data deletions in one transaction.
+    # Perform all business-data deletions in one transaction.
     try:
         with client.start_session() as mongo_session:
             with mongo_session.start_transaction():
@@ -747,7 +760,6 @@ def admin_reset_account():
     return redirect(url_for("admin_panel"))
 
 
-
 # =========================
 # BIZFLOW SUPER ADMIN PANEL
 # =========================
@@ -776,7 +788,6 @@ def admin_panel():
             "owner_id": user_id
         })
 
-        
     # =========================
     # SYSTEM HEALTH CHECK
     # =========================
@@ -787,7 +798,6 @@ def admin_panel():
     except PyMongoError:
         database_status = "Unavailable"
 
-       
     # =========================
     # DATABASE STORAGE METRICS
     # =========================
@@ -836,11 +846,7 @@ def admin_panel():
             "total_display": "500 MB",
             "remaining_display": "Unavailable"
         }
- 
 
-
-        
-   
     # =========================
     # SYSTEM OVERVIEW STATISTICS
     # =========================
@@ -947,8 +953,6 @@ def admin_panel():
         "estimated_net_profit": estimated_net_profit
     }
 
-
-
     # Optional selected user from the URL.
     selected_user_id = request.args.get("user_id", "").strip()
     selected_user = None
@@ -961,7 +965,6 @@ def admin_panel():
                 {"password_hash": 0}
             )
 
-    
     if selected_user:
         selected_owner_id = str(selected_user["_id"])
 
@@ -991,7 +994,6 @@ def admin_panel():
                     "owner_id": selected_owner_id
                 })
 
-
     # Count records belonging to each selected user's business.
     record_collections = {
         "sales_count": db["sales"],
@@ -1012,8 +1014,6 @@ def admin_panel():
                 "owner_id": selected_owner_id
             })
 
-
-            
     # =========================
     # LOAD ADMIN ANNOUNCEMENTS
     # =========================
@@ -1022,9 +1022,6 @@ def admin_panel():
         db["announcements"].find().sort("created_at", -1)
     )
 
-
-
-            
     # =========================
     # RECENT PLATFORM ACTIVITY
     # =========================
@@ -1071,7 +1068,7 @@ def admin_panel():
 
     recent_activity = recent_activity[:10]
 
-        # =========================
+    # =========================
     # MAINTENANCE USER LIST
     # =========================
 
@@ -1084,7 +1081,7 @@ def admin_panel():
         ).sort("name", 1)
     )
 
-        # =========================
+    # =========================
     # PENDING PASSWORD RESET REQUESTS
     # =========================
 
@@ -1094,7 +1091,6 @@ def admin_panel():
         }).sort("created_at", -1)
     )
 
-    
     # =========================
     # PENDING ACCOUNT APPROVALS
     # =========================
@@ -1104,8 +1100,6 @@ def admin_panel():
             "account_status": "pending"
         }).sort("created_at", -1)
     )
-
-
 
     return render_template(
         "admin_panel.html",
@@ -1126,6 +1120,7 @@ def admin_panel():
 # =========================
 # ADMIN: TOGGLE MAINTENANCE MODE
 # =========================
+
 
 @app.route("/admin/maintenance", methods=["POST"])
 def admin_toggle_maintenance():
@@ -1154,7 +1149,6 @@ def admin_toggle_maintenance():
     )
 
     return redirect(url_for("admin_panel"))
-
 
 
 # =========================
@@ -1205,7 +1199,6 @@ def admin_review_password_reset(request_id, decision):
         if result.modified_count != 1:
             return "This request has already been processed.", 409
 
-    
     else:
         proposed_password_hash = reset_request.get(
             "proposed_password_hash"
@@ -1249,9 +1242,7 @@ def admin_review_password_reset(request_id, decision):
             }
         )
 
-
     return redirect(url_for("admin_panel"))
-
 
 
 # =========================
@@ -1306,8 +1297,6 @@ def admin_review_account(user_id, decision):
     return redirect(url_for("admin_panel"))
 
 
-
-    
 # =========================
 # ADMIN: CREATE ANNOUNCEMENT
 # =========================
@@ -1341,7 +1330,7 @@ def admin_create_announcement():
 
     return redirect(url_for("admin_panel") + "#announcements")
 
-    
+
 # =========================
 # ADMIN: TOGGLE ANNOUNCEMENT STATUS
 # =========================
@@ -1376,7 +1365,7 @@ def admin_toggle_announcement(announcement_id):
 
     return redirect(url_for("admin_panel") + "#announcements")
 
-    
+
 # =========================
 # ADMIN: DELETE ANNOUNCEMENT
 # =========================
@@ -1405,10 +1394,6 @@ def admin_delete_announcement(announcement_id):
     return redirect(url_for("admin_panel") + "#announcements")
 
 
-
-
-
-    
 @app.route("/admin/users/<user_id>/toggle-status", methods=["POST"])
 def admin_toggle_user_status(user_id):
     if "user_id" not in session:
@@ -1484,11 +1469,8 @@ def admin_delete_user(user_id):
     # Never allow deletion of the currently logged-in account
     if str(user_to_delete["_id"]) == session.get("user_id"):
         return "You cannot delete your own logged-in account.", 403
-    
 
     owner_id = str(user_object_id)
-
-            
 
     # Find businesses owned by this user
     owned_businesses = list(
@@ -1499,7 +1481,7 @@ def admin_delete_user(user_id):
 
     business_ids = [str(business["_id"]) for business in owned_businesses]
 
-               # Collections containing records inside an owned business
+    # Collections containing records inside an owned business
     record_collections = [
         "products",
         "services",
@@ -1540,7 +1522,7 @@ def admin_delete_user(user_id):
         "user_id": owner_id
     })
 
-       # Finally, delete the user account only if it is not the Super Admin
+    # Finally, delete the user account only if it is not the Super Admin
     delete_result = users_collection.delete_one({
         "_id": user_object_id,
         "email": {"$ne": SUPER_ADMIN_EMAIL}
@@ -1550,7 +1532,6 @@ def admin_delete_user(user_id):
         return "Account was not deleted. Please verify its status.", 409
 
     return redirect(url_for("admin_panel"))
-
 
 
 @app.route("/admin/business/<business_id>/sales")
@@ -1587,7 +1568,7 @@ def admin_business_sales(business_id):
         sales=sales
     )
 
- 
+
 @app.route("/admin/business/<business_id>/sales/<reference>/receipt")
 def admin_sale_receipt(business_id, reference):
     if "user_id" not in session:
@@ -1653,7 +1634,7 @@ def admin_business_bookings(business_id):
         bookings_list=bookings_list
     )
 
-    
+
 @app.route("/admin/business/<business_id>/products")
 def admin_business_products(business_id):
     if "user_id" not in session:
@@ -1686,7 +1667,6 @@ def admin_business_products(business_id):
     )
 
 
-    
 @app.route("/admin/business/<business_id>/services")
 def admin_business_services(business_id):
     if "user_id" not in session:
@@ -1719,7 +1699,6 @@ def admin_business_services(business_id):
     )
 
 
-    
 @app.route("/admin/business/<business_id>/expenses")
 def admin_business_expenses(business_id):
     if "user_id" not in session:
@@ -1750,7 +1729,6 @@ def admin_business_expenses(business_id):
         business=business,
         expenses_list=expenses_list
     )
-
 
 
 @app.route("/admin/business/<business_id>/workers")
@@ -1807,7 +1785,6 @@ def admin_business_workers(business_id):
     )
 
 
-    
 @app.route("/admin/business/<business_id>/categories")
 def admin_business_categories(business_id):
     if "user_id" not in session:
@@ -1906,17 +1883,6 @@ def admin_business_details(business_id):
     )
 
 
-
-
-
-
-
-
-
-
-
-
-
 # =========================
 # CREATE BUSINESS PAGE
 # =========================
@@ -1980,8 +1946,6 @@ def business_workspace(business_id):
         role=role
     )
 
-    
-    
 
 @app.route("/business/<business_id>/loan-customer-search")
 def loan_customer_search(business_id):
@@ -2033,7 +1997,6 @@ def loan_customer_search(business_id):
     return jsonify({"names": names[:10]})
 
 
-     
 # =========================
 # REPORTS & ANALYTICS
 # =========================
@@ -2153,7 +2116,8 @@ def reports(business_id):
             trend_data[sale_date]["profit"] += profit
 
             for item in sale.get("items", []):
-                product_id = item.get("product_id") or item.get("name", "unknown")
+                product_id = item.get(
+                    "product_id") or item.get("name", "unknown")
                 product_name = item.get("name", "Unknown product")
                 quantity = float(item.get("quantity", 0) or 0)
                 line_revenue = float(
@@ -2175,7 +2139,6 @@ def reports(business_id):
                 product_totals[product_id]["revenue"] += line_revenue
                 product_totals[product_id]["profit"] += line_profit
 
-                
     # =========================
     # OPERATING EXPENSES
     # =========================
@@ -2252,7 +2215,6 @@ def reports(business_id):
         reverse=True
     )[:5]
 
-
     # Highest quantity sold appears first.
     best_sellers = sorted(
         product_totals.values(),
@@ -2301,11 +2263,10 @@ def reports(business_id):
         trend_profit=trend_profit
     )
 
-
-    
     # =========================
 # CREATE PRODUCT WORKSPACE
 # =========================
+
 
 @app.route("/business/<business_id>/products/create", methods=["GET", "POST"])
 def create_product(business_id):
@@ -2360,9 +2321,8 @@ def create_product(business_id):
         business=business,
         categories=categories
     )
-    
-    
-    
+
+
 # =========================
 # DELETE CATEGORY
 # =========================
@@ -2420,11 +2380,10 @@ def delete_category(business_id, category_id):
         business_id=business_id
     ))
 
-    
-    
     # =========================
 # CATEGORY WORKSPACE
 # =========================
+
 
 @app.route("/business/<business_id>/products/category/<category_id>")
 def category_workspace(business_id, category_id):
@@ -2448,26 +2407,26 @@ def category_workspace(business_id, category_id):
 
     if not category:
         return "Category not found or access denied.", 404
-    
+
     products = list(
-    db["products"].find({
-        "business_id": str(business["_id"]),
-        "category_id": str(category["_id"]),
-        "owner_id": session["user_id"]
-    }).sort("name", 1)
-)
+        db["products"].find({
+            "business_id": str(business["_id"]),
+            "category_id": str(category["_id"]),
+            "owner_id": session["user_id"]
+        }).sort("name", 1)
+    )
 
     return render_template(
-    "category_workspace.html",
-    business=business,
-    category=category,
-    products=products
-)
-    
-    
+        "category_workspace.html",
+        business=business,
+        category=category,
+        products=products
+    )
+
     # =========================
 # CREATE PRODUCT IN CATEGORY
 # =========================
+
 
 @app.route("/business/<business_id>/products/category/<category_id>/create", methods=["GET", "POST"])
 def create_product_in_category(business_id, category_id):
@@ -2495,7 +2454,7 @@ def create_product_in_category(business_id, category_id):
         return "Category not found or access denied.", 404
 
     if request.method == "POST":
-    
+
         product_name = request.form["product_name"].strip()
         sku = request.form["sku"].strip()
         description = request.form["description"].strip()
@@ -2508,8 +2467,6 @@ def create_product_in_category(business_id, category_id):
         buying_price = float(request.form["buying_price"])
         selling_price = float(request.form["selling_price"])
 
-        
-        
         allowed_measurements = {
             "Piece",
             "Kilogram",
@@ -2532,7 +2489,6 @@ def create_product_in_category(business_id, category_id):
         large_cups_per_keg = None
         small_cups_per_keg = None
 
-
         if has_selling_sizes:
             try:
                 large_cups_per_keg = int(
@@ -2553,7 +2509,6 @@ def create_product_in_category(business_id, category_id):
             if large_cups_per_keg <= 0 or small_cups_per_keg <= 0:
                 return "Cup servings per keg must be greater than zero.", 400
 
-            
             if (
                 not math.isfinite(large_cup_price)
                 or not math.isfinite(small_cup_price)
@@ -2574,7 +2529,6 @@ def create_product_in_category(business_id, category_id):
                     "servings_per_piece": small_cups_per_keg
                 }
             ]
-
 
         if not product_name:
             return "Product name is required.", 400
@@ -2620,9 +2574,7 @@ def create_product_in_category(business_id, category_id):
         category=category
     )
 
-    
-    
-    
+
 # =========================
 # SELL PRODUCT - CUSTOMER CORNER
 # =========================
@@ -2698,7 +2650,7 @@ def sell_products(business_id):
         sale_token=secrets.token_urlsafe(24)
     )
 
-    
+
 # =========================
 # CONFIRM PRODUCT SALE
 # =========================
@@ -2708,11 +2660,10 @@ def sell_products(business_id):
     methods=["POST"]
 )
 def confirm_product_sale(business_id):
-    
+
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    
     # Validate the business ID.
     if not ObjectId.is_valid(business_id):
         return "Invalid business.", 400
@@ -2744,31 +2695,29 @@ def confirm_product_sale(business_id):
         return "Access denied.", 403
 
     business = businesses_collection.find_one({
-    "_id": ObjectId(business_id),
-    "owner_id": owner_id
-})
+        "_id": ObjectId(business_id),
+        "owner_id": owner_id
+    })
 
     if not business:
         return "Business not found or access denied.", 404
 
     business_id_string = str(business["_id"])
 
-
     # Read submitted form data
     cart_data = request.form.get("cart_data", "")
     payment_method = request.form.get("payment_method", "").strip()
     sale_token = request.form.get("sale_token", "").strip()
     draft_id = request.form.get("draft_id", "").strip()
-    
+
     sale_type = request.form.get("sale_type", "paid").strip().lower()
     customer_name = request.form.get("customer_name", "").strip()
-    
+
     if sale_type not in {"paid", "loan"}:
         return "Invalid sale type.", 400
-    
+
     if sale_type == "loan" and not customer_name:
         return "Enter the customer's name for a loan sale.", 400
-    
 
     allowed_methods = {
         "Cash",
@@ -2781,14 +2730,13 @@ def confirm_product_sale(business_id):
     if sale_type == "paid" and payment_method not in allowed_methods:
         return "Please select a valid payment method.", 400
     if sale_type == "loan":
-      payment_method = "Credit"
-        
+        payment_method = "Credit"
 
     if not sale_token or len(sale_token) > 200:
         return "Invalid sale submission. Refresh the page and try again.", 400
 
     try:
-        
+
         cart = json.loads(cart_data)
 
         if not isinstance(cart, list) or not cart:
@@ -2829,7 +2777,6 @@ def confirm_product_sale(business_id):
 
     except (ValueError, TypeError, json.JSONDecodeError):
         return "Invalid cart data. Please refresh and try again.", 400
-
 
     sales_collection = db["sales"]
 
@@ -2883,7 +2830,6 @@ def confirm_product_sale(business_id):
                 total_revenue = 0.0
                 total_cost = 0.0
 
-               
                 # Always retrieve prices and stock from MongoDB.
                 for requested in requested_items:
 
@@ -3007,7 +2953,6 @@ def confirm_product_sale(business_id):
                     total_revenue += line_revenue
                     total_cost += line_cost
 
-                    
                 # Validate combined stock usage for each product.
                 combined_stock_usage = {}
 
@@ -3045,11 +2990,6 @@ def confirm_product_sale(business_id):
                             f"available: {available_stock:g}."
                         )
 
-
-
-                
-                
-                
                 # Deduct stock once per product using the combined usage.
                 for product_id, stock_used in combined_stock_usage.items():
 
@@ -3077,16 +3017,6 @@ def confirm_product_sale(business_id):
                             "Refresh Customer Corner and try again."
                         )
 
-
-                
-
-
-
-                    
-                        
-
-                    
-
                 total_revenue = round(total_revenue, 2)
                 total_cost = round(total_cost, 2)
                 gross_profit = round(
@@ -3096,32 +3026,29 @@ def confirm_product_sale(business_id):
 
                 amount_paid = total_revenue if sale_type == "paid" else 0.0
                 balance = round(total_revenue - amount_paid, 2)
-                
-                
 
                 sale = {
                     "reference": sale_reference,
-    "sale_token": sale_token,
-    "draft_id": draft_id if draft_id else None,
-    "business_id": business_id_string,
-    "owner_id": owner_id,
-    "processed_by": user_id,
-    "processed_by_role": role,
-    "items": line_items,
-    "total": total_revenue,
-    "total_cost": total_cost,
-    "gross_profit": gross_profit,
-    "sale_type": sale_type,
-    "customer_name": customer_name if sale_type == "loan" else "",
-    "payment_method": payment_method,
-    "payment_status": payment_status,
-    "amount_paid": amount_paid,
-    "balance": balance,
-    "payments": [],
-    "status": "Completed",
-    "created_at": sale_time
-}
-                   
+                    "sale_token": sale_token,
+                    "draft_id": draft_id if draft_id else None,
+                    "business_id": business_id_string,
+                    "owner_id": owner_id,
+                    "processed_by": user_id,
+                    "processed_by_role": role,
+                    "items": line_items,
+                    "total": total_revenue,
+                    "total_cost": total_cost,
+                    "gross_profit": gross_profit,
+                    "sale_type": sale_type,
+                    "customer_name": customer_name if sale_type == "loan" else "",
+                    "payment_method": payment_method,
+                    "payment_status": payment_status,
+                    "amount_paid": amount_paid,
+                    "balance": balance,
+                    "payments": [],
+                    "status": "Completed",
+                    "created_at": sale_time
+                }
 
                 sales_collection.insert_one(
                     sale,
@@ -3129,7 +3056,7 @@ def confirm_product_sale(business_id):
                 )
 
                 # Close the customer tab only after the sale commits.
-                        # Close the customer tab within the same transaction.
+                # Close the customer tab within the same transaction.
                 # If this update fails, the sale transaction rolls back.
                 if draft_id:
                     if not ObjectId.is_valid(draft_id):
@@ -3168,11 +3095,9 @@ def confirm_product_sale(business_id):
             )
         )
 
-
     except ValueError as error:
         return str(error), 400
 
-    
     except DuplicateKeyError:
         # A repeated submission may already have been recorded.
         existing_sale = sales_collection.find_one({
@@ -3212,9 +3137,6 @@ def confirm_product_sale(business_id):
                 )
             )
 
-        
-
-
         return "This sale submission already exists.", 409
 
     except PyMongoError:
@@ -3224,18 +3146,13 @@ def confirm_product_sale(business_id):
             "Check the database connection and try again.",
             500
         )
-    
 
 
-    
 # =========================
 # OPEN CUSTOMER TABS
 # =========================
 
 
-
-
-        
 @app.route(
     "/business/<business_id>/sales-drafts/save",
     methods=["POST"]
@@ -3264,7 +3181,6 @@ def save_sales_draft(business_id):
 
         items = []
 
-        
         for cart_key, item in cart.items():
             if not isinstance(item, dict):
                 return "Invalid product in draft.", 400
@@ -3355,7 +3271,6 @@ def save_sales_draft(business_id):
                 "unit": selling_size or unit
             })
 
-
         now = datetime.now(timezone.utc)
 
         if draft_id:
@@ -3423,8 +3338,7 @@ def save_sales_draft(business_id):
         app.logger.exception("Could not save customer tab.")
         return "The customer tab could not be saved. Please try again.", 500
 
-    
-    
+
 @app.route("/business/<business_id>/sales-drafts", methods=["GET"])
 def list_sales_drafts(business_id):
     if "user_id" not in session:
@@ -3447,7 +3361,6 @@ def list_sales_drafts(business_id):
         total = 0.0
         item_count = 0
 
-        
         for item in draft.get("items", []):
             product = db["products"].find_one({
                 "_id": ObjectId(item["product_id"]),
@@ -3481,7 +3394,6 @@ def list_sales_drafts(business_id):
 
                 total += quantity * price
                 item_count += 1
-
 
         results.append({
             "id": str(draft["_id"]),
@@ -3534,7 +3446,6 @@ def get_sales_draft(business_id, draft_id):
             "owner_id": business["owner_id"]
         })
 
-        
         if product:
             selling_size = item.get("selling_size", "") or ""
             matching_size = None
@@ -3577,7 +3488,6 @@ def get_sales_draft(business_id, draft_id):
                     matching_size.get("servings_per_piece", 1)
                 ) if matching_size else 1
             })
-
 
     return {
         "id": str(draft["_id"]),
@@ -3779,7 +3689,7 @@ def create_order(business_id):
     except ValueError as error:
         return str(error), 400
 
-        
+
 @app.route(
     "/business/<business_id>/orders/<order_id>/edit",
     methods=["GET", "POST"]
@@ -3862,7 +3772,6 @@ def edit_order(business_id, order_id):
     )
 
 
-        
 @app.route(
     "/business/<business_id>/orders/<order_id>/payment",
     methods=["POST"]
@@ -3963,10 +3872,6 @@ def record_order_payment(business_id, order_id):
     )
 
 
-
-
-
-
 @app.route("/business/<business_id>/orders")
 def business_orders(business_id):
 
@@ -4011,7 +3916,6 @@ def business_orders(business_id):
         orders=orders
     )
 
-        
 
 @app.route("/business/<business_id>/loans")
 def business_loans(business_id):
@@ -4107,9 +4011,6 @@ def business_loans(business_id):
         total_outstanding=total_outstanding,
         role=role
     )
-
-
-
 
 
 @app.route(
@@ -4331,11 +4232,6 @@ def record_loan_repayment(business_id, reference):
     )
 
 
-
-
-        
-        
-        
 # =========================
 # VIEW SALES RECEIPT
 # =========================
@@ -4373,9 +4269,6 @@ def sale_receipt(business_id, reference):
         business=business,
         sale=sale
     )
-
-
-
 
 
 @app.route("/business/<business_id>/sales")
@@ -4542,13 +4435,9 @@ def sales_history(business_id):
         role=role
     )
 
-
-
-    
   # =========================
 # PRODUCTS
 # =========================
-
 
 
 @app.route("/business/<business_id>/products")
@@ -4579,9 +4468,6 @@ def products(business_id):
         business=business,
         products=products
     )
-
-
-
 
     # =========================
 # VIEW INVENTORY
@@ -4663,7 +4549,6 @@ def view_inventory(business_id):
     )
 
 
-
 # =========================
 # VIEW PRODUCT
 # =========================
@@ -4702,6 +4587,7 @@ def view_product(business_id, product_id):
 # =========================
 # EDIT PRODUCT
 # =========================
+
 
 @app.route(
     "/business/<business_id>/products/<product_id>/edit",
@@ -4963,6 +4849,7 @@ def services(business_id):
 # VIEW SERVICE
 # =========================
 
+
 @app.route("/business/<business_id>/services/<service_id>")
 def view_service(business_id, service_id):
 
@@ -4993,10 +4880,11 @@ def view_service(business_id, service_id):
         business=business,
         service=service
     )
-    
+
     # =========================
 # EDIT SERVICE
 # =========================
+
 
 @app.route(
     "/business/<business_id>/services/<service_id>/edit",
@@ -5117,6 +5005,7 @@ def delete_service(business_id, service_id):
 # ADD SERVICE
 # =========================
 
+
 @app.route(
     "/business/<business_id>/services/add",
     methods=["GET", "POST"]
@@ -5172,10 +5061,11 @@ def add_service(business_id):
         "add_service.html",
         business=business
     )
-    
+
    # =========================
 # BOOKINGS
 # =========================
+
 
 @app.route(
     "/business/<business_id>/bookings",
@@ -5198,11 +5088,7 @@ def bookings(business_id):
 
     owner_id = str(business["owner_id"])
     user_id = session["user_id"]
-    
-    
 
-
-  
     # =========================
     # CREATE BOOKING
     # =========================
@@ -5344,8 +5230,6 @@ def bookings(business_id):
             )
         )
 
-
-
     # =========================
     # GET BOOKINGS
     # =========================
@@ -5358,18 +5242,17 @@ def bookings(business_id):
 
     )
 
-
     # =========================
     # BOOKING STATISTICS
     # =========================
 
     total_bookings = len(bookings)
-    
+
     total_booking_value = sum(
         float(booking.get("amount", 0) or 0)
         for booking in bookings
     )
-    
+
     total_customers = len(set(
         booking.get("customer", "").strip().lower()
         for booking in bookings
@@ -5421,7 +5304,6 @@ def bookings(business_id):
         if booking.get("status") == "No-show"
     )
 
-
     # =========================
     # DATE TRACKING
     # =========================
@@ -5437,11 +5319,9 @@ def bookings(business_id):
     # Current month
     month_year = today.strftime("%Y-%m")
 
-
     today_bookings = 0
     this_week_bookings = 0
     this_month_bookings = 0
-
 
     for booking in bookings:
 
@@ -5461,21 +5341,17 @@ def bookings(business_id):
 
             continue
 
-
         # TODAY
         if booking_date == today:
             today_bookings += 1
-
 
         # THIS WEEK
         if week_start <= booking_date <= week_end:
             this_week_bookings += 1
 
-
         # THIS MONTH
         if booking_date.strftime("%Y-%m") == month_year:
             this_month_bookings += 1
-
 
     # =========================
     # BOOKING REVENUE
@@ -5489,7 +5365,6 @@ def bookings(business_id):
     pending_payment_bookings = 0
     partial_payment_bookings = 0
     total_outstanding = 0
-
 
     for booking in bookings:
 
@@ -5511,8 +5386,7 @@ def bookings(business_id):
 
             partial_payment_bookings += 1
 
-
-               # =========================
+            # =========================
         # BOOKING AMOUNT
         # =========================
 
@@ -5526,9 +5400,8 @@ def bookings(business_id):
 
             amount = 0
 
-
         # Actual amount received
-               # Actual amount received
+            # Actual amount received
         amount_paid = booking.get("amount_paid")
 
         if amount_paid is None:
@@ -5545,14 +5418,12 @@ def bookings(business_id):
 
             except (TypeError, ValueError):
                 amount_paid = 0
-                
-                        # Outstanding balance
+
+                # Outstanding balance
         balance = amount - amount_paid
 
         if balance > 0 and payment_status != "Refunded":
             total_outstanding += balance
-             
-             
 
         # =========================
         # BOOKING DATE
@@ -5574,7 +5445,6 @@ def bookings(business_id):
 
             continue
 
-
         # =========================
         # REVENUE
         # =========================
@@ -5594,7 +5464,6 @@ def bookings(business_id):
             if booking_date.strftime("%Y-%m") == month_year:
                 this_month_revenue += amount_paid
 
-
     # =========================
     # SERVICES
     # =========================
@@ -5605,7 +5474,6 @@ def bookings(business_id):
             "owner_id": owner_id
         })
     )
-
 
     # =========================
     # DISPLAY BOOKINGS PAGE
@@ -5643,7 +5511,7 @@ def bookings(business_id):
         partial_payment_count=partial_payment_count,
         unpaid_payment_count=unpaid_payment_count,
         total_outstanding=total_outstanding,
-        
+
         total_booking_value=total_booking_value,
         total_customers=total_customers
     )
@@ -5690,7 +5558,7 @@ def new_booking(business_id):
         services=services
     )
 
-    
+
 # =========================
 # LOGOUT
 # =========================
@@ -5701,6 +5569,8 @@ def logout():
     session.clear()
 
     return redirect(url_for("login"))
+
+
 @app.route(
     "/business/<business_id>/bookings/<booking_id>/complete",
     methods=["POST"]
@@ -5718,20 +5588,20 @@ def complete_booking(business_id, booking_id):
         return "Business not found or access denied.", 404
 
     booking = db["bookings"].find_one({
-    "_id": ObjectId(booking_id),
-    "business_id": str(business["_id"]),
-    "owner_id": session["user_id"]
-})
+        "_id": ObjectId(booking_id),
+        "business_id": str(business["_id"]),
+        "owner_id": session["user_id"]
+    })
 
     if not booking:
         return "Booking not found.", 404
 
     db["bookings"].update_one(
-    {
-        "_id": ObjectId(booking_id),
-        "business_id": str(business["_id"]),
-        "owner_id": session["user_id"]
-    },
+        {
+            "_id": ObjectId(booking_id),
+            "business_id": str(business["_id"]),
+            "owner_id": session["user_id"]
+        },
         {
             "$set": {
                 "status": "Completed",
@@ -5748,7 +5618,6 @@ def complete_booking(business_id, booking_id):
     )
 
 
-    
 # =========================
 # EXPENSES MANAGEMENT
 # =========================
@@ -6022,7 +5891,6 @@ def delete_expense(business_id, expense_id):
     ))
 
 
-
 @app.route(
     "/business/<business_id>/bookings/<booking_id>",
     methods=["GET"]
@@ -6094,7 +5962,6 @@ def edit_booking(business_id, booking_id):
     if not booking:
         return "Booking not found or access denied.", 404
 
-    
     if request.method == "POST":
 
         customer = request.form.get("customer", "").strip()
@@ -6229,7 +6096,6 @@ def edit_booking(business_id, booking_id):
             )
         )
 
-
     # Load services belonging to the business owner
     services = list(db["services"].find({
         "business_id": str(business["_id"]),
@@ -6245,8 +6111,7 @@ def edit_booking(business_id, booking_id):
         role=role
     )
 
-    
-    
+
 # =========================
 # RESTOCK PRODUCT
 # =========================
@@ -6303,11 +6168,13 @@ def restock_product(business_id, product_id):
                 raise ValueError("Enter a valid buying price.")
 
             # Whole-item products cannot be restocked fractionally.
-            unit = str(product.get("measurement_type", "Piece")).strip().lower()
+            unit = str(product.get("measurement_type", "Piece")
+                       ).strip().lower()
             whole_units = {"piece", "pieces", "item", "items"}
 
             if unit in whole_units and not quantity_to_add.is_integer():
-                raise ValueError("This product must be restocked in whole units.")
+                raise ValueError(
+                    "This product must be restocked in whole units.")
 
             if not purchase_date:
                 purchase_date = datetime.now(
@@ -6406,10 +6273,8 @@ def restock_product(business_id, product_id):
     )
 
 
-
 # =========================
 # RUN APPLICATION
 # =========================
-
 if __name__ == "__main__":
     app.run(debug=True)
