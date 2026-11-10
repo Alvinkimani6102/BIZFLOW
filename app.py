@@ -334,6 +334,25 @@ def sitemap():
         mimetype="application/xml"
     )
 
+    # =========================
+# ROBOTS.TXT
+# =========================
+
+
+@app.route("/robots.txt")
+def robots():
+
+    robots_txt = """User-agent: *
+Allow: /
+
+Sitemap: https://bizflow-if4z.onrender.com/sitemap.xml
+"""
+
+    return app.response_class(
+        robots_txt,
+        mimetype="text/plain"
+    )
+
 
 # =========================
 # SIGNUP
