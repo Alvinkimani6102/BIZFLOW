@@ -341,8 +341,11 @@ def sitemap():
 
 @app.route("/robots.txt")
 def robots():
-    robots_txt = """User-agent: *
-Disallow:
+    robots_txt = """User-agent: Google-InspectionTool
+Allow: /
+
+User-agent: *
+Allow: /
 
 Sitemap: https://bizflow-if4z.onrender.com/sitemap.xml
 """
@@ -5097,7 +5100,7 @@ def add_service(business_id):
         business=business
     )
 
-   # =========================
+    # =========================
 # BOOKINGS
 # =========================
 
