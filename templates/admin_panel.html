@@ -1227,15 +1227,188 @@
 }
 
 
+/* ==============================
+   FLOATING SUPER ADMIN MENU
+============================== */
+
+.admin-layout {
+    display: block;
+    min-height: 100vh;
+}
+
+/* Floating hamburger button */
+.admin-menu-toggle {
+    position: fixed;
+    top: 22px;
+    left: 18px;
+    z-index: 1202;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    border-radius: 12px;
+    background: #087cf5;
+    box-shadow: 0 5px 18px rgba(8, 124, 245, 0.3);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.admin-menu-toggle:hover {
+    background: #0565cc;
+    transform: translateY(-2px);
+}
+
+.admin-menu-toggle span {
+    display: block;
+    width: 21px;
+    height: 2px;
+    border-radius: 5px;
+    background: white;
+}
+
+/* Slide-out sidebar */
+.admin-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    z-index: 1201;
+    width: min(290px, 84vw) !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    flex: none !important;
+    overflow-y: auto;
+    padding: 70px 16px 25px !important;
+    background: linear-gradient(180deg, #0b1733, #101f42);
+    box-shadow: 10px 0 35px rgba(15, 23, 42, 0.2);
+    transform: translateX(-110%);
+    transition: transform 0.3s ease, visibility 0.3s ease;
+    visibility: hidden;
+}
+
+.admin-sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+}
+
+.admin-sidebar h2 {
+    margin-top: 5px;
+}
+
+/* Keep navigation links vertical on every screen */
+.admin-sidebar a {
+    display: flex !important;
+    width: 100%;
+    margin: 6px 0 !important;
+    padding: 14px 13px !important;
+}
+
+/* Close button inside sidebar */
+.admin-menu-close {
+    position: absolute;
+    top: 17px;
+    right: 17px;
+    width: 37px;
+    height: 37px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 9px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 27px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.admin-menu-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Dark background behind open menu */
+.admin-menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: rgba(5, 15, 35, 0.48);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.admin-menu-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Main dashboard uses the available screen */
+.admin-main {
+    width: 100%;
+    min-width: 0;
+    padding: 28px 32px 40px 86px;
+}
+
+/* Prevent background scrolling while menu is open */
+body.admin-menu-open {
+    overflow: hidden;
+}
+
+/* Mobile adjustments */
+@media (max-width: 700px) {
+    .admin-menu-toggle {
+        top: 14px;
+        left: 12px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .admin-main {
+        padding: 16px 14px 30px 70px;
+    }
+
+    .admin-header {
+        padding-left: 16px;
+    }
+}
+
+
+
 
 
 </style>
 
-</head>
-<body>
-<div class="admin-layout">
+<!-- FLOATING ADMIN MENU BUTTON -->
+<button
+    type="button"
+    class="admin-menu-toggle"
+    id="adminMenuToggle"
+    aria-label="Open administration menu"
+    aria-controls="adminSidebar"
+    aria-expanded="false"
+>
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
 
-    <aside class="admin-sidebar">
+<!-- MENU BACKGROUND OVERLAY -->
+<div class="admin-menu-overlay" id="adminMenuOverlay"></div>
+
+<div class="admin-layout">
+<body>
+
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+    <button
+        type="button"
+        class="admin-menu-close"
+        id="adminMenuClose"
+        aria-label="Close administration menu"
+    >
+        &times;
+    </button>
         <h2>BIZFLOW</h2>
         <p>SUPER ADMINISTRATION</p>
 
@@ -2301,5 +2474,63 @@ document.addEventListener("DOMContentLoaded", function () {
     </main>
 
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const menuButton = document.getElementById("adminMenuToggle");
+    const sidebar = document.getElementById("adminSidebar");
+    const closeButton = document.getElementById("adminMenuClose");
+    const overlay = document.getElementById("adminMenuOverlay");
+
+    if (!menuButton || !sidebar || !closeButton || !overlay) {
+        return;
+    }
+
+    function openAdminMenu() {
+        sidebar.classList.add("open");
+        overlay.classList.add("show");
+        document.body.classList.add("admin-menu-open");
+
+        menuButton.setAttribute("aria-expanded", "true");
+        menuButton.setAttribute("aria-label", "Close administration menu");
+    }
+
+    function closeAdminMenu() {
+        sidebar.classList.remove("open");
+        overlay.classList.remove("show");
+        document.body.classList.remove("admin-menu-open");
+
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "Open administration menu");
+    }
+
+    menuButton.addEventListener("click", function () {
+        if (sidebar.classList.contains("open")) {
+            closeAdminMenu();
+        } else {
+            openAdminMenu();
+        }
+    });
+
+    closeButton.addEventListener("click", closeAdminMenu);
+
+    overlay.addEventListener("click", closeAdminMenu);
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeAdminMenu();
+        }
+    });
+
+    // Close the menu when a navigation link is selected.
+    sidebar.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", closeAdminMenu);
+    });
+
+});
+</script>
+
 </body>
 </html>
