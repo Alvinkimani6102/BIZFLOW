@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,30 +11,326 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
-          <style>
-.password-wrapper {
-    position: relative;
-    width: 100%;
-}
+    <style>
+        :root {
+            --biz-blue: #087cf5;
+            --biz-dark: #0b2145;
+            --biz-hover: #0565cc;
+        }
 
-.password-wrapper input {
-    width: 100%;
-    box-sizing: border-box;
-    padding-right: 48px;
-}
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
 
-.toggle-password {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 5px;
-}
-</style>
+        .password-wrapper input {
+            width: 100%;
+            box-sizing: border-box;
+            padding-right: 48px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        /* ANIMATED LOGIN BACKGROUND */
+
+        .signup-page {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background:
+                radial-gradient(circle at 15% 20%,
+                    rgba(8,124,245,.12), transparent 35%),
+                radial-gradient(circle at 85% 80%,
+                    rgba(11,33,69,.10), transparent 35%),
+                #f5f8fc;
+            min-height: 650px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 55px 20px;
+        }
+
+        .signup-page::before,
+        .signup-page::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .signup-page::before {
+            width: 320px;
+            height: 320px;
+            top: 5%;
+            left: -130px;
+            border: 1px solid rgba(8,124,245,.16);
+            box-shadow:
+                0 0 50px rgba(8,124,245,.08),
+                inset 0 0 40px rgba(8,124,245,.05);
+            animation: floatCircle 9s ease-in-out infinite alternate;
+        }
+
+        .signup-page::after {
+            width: 240px;
+            height: 240px;
+            bottom: 0;
+            right: -90px;
+            border: 1px solid rgba(11,33,69,.13);
+            animation: floatCircle 7s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatCircle {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+            to {
+                transform: translate(35px, -25px) scale(1.12);
+            }
+        }
+
+        /* LOGIN PANEL */
+
+        .signup-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 460px;
+            padding: 38px;
+            overflow: hidden;
+            border-radius: 18px;
+            background: rgba(255,255,255,.94);
+            border: 1px solid rgba(8,124,245,.15);
+            box-shadow:
+                0 18px 55px rgba(11,33,69,.12),
+                0 0 25px rgba(8,124,245,.06);
+            animation: panelReveal 1s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        @keyframes panelReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(45px) scale(.94);
+                clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            }
+            65% {
+                opacity: 1;
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+        }
+
+        /* DIAGONAL LIGHT SWEEP */
+
+        .signup-container::before {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: -65%;
+            width: 45%;
+            height: 300%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(8,124,245,.09),
+                rgba(255,255,255,.5),
+                transparent
+            );
+            transform: rotate(28deg);
+            pointer-events: none;
+            animation: lightSweep 2.2s ease 0.6s both;
+        }
+
+        @keyframes lightSweep {
+            from {
+                left: -65%;
+            }
+            to {
+                left: 150%;
+            }
+        }
+
+        .signup-container h1 {
+            color: var(--biz-dark);
+            animation: textReveal .7s ease .35s both;
+        }
+
+        .signup-description {
+            animation: textReveal .7s ease .5s both;
+        }
+
+        @keyframes textReveal {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .signup-container .form-group {
+            animation: fieldReveal .7s ease both;
+        }
+
+        .signup-container .form-group:nth-of-type(1) {
+            animation-delay: .65s;
+        }
+
+        .signup-container .form-group:nth-of-type(2) {
+            animation-delay: .8s;
+        }
+
+        @keyframes fieldReveal {
+            from {
+                opacity: 0;
+                transform: translateX(-18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .signup-container input {
+            transition: border-color .3s ease,
+                        box-shadow .3s ease;
+        }
+
+        .signup-container input:focus {
+            border-color: var(--biz-blue);
+            box-shadow: 0 0 0 4px rgba(8,124,245,.10);
+            outline: none;
+        }
+
+        /* LOGIN BUTTON */
+
+        .signup-submit {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
+            overflow: hidden;
+            background: var(--biz-blue);
+            transition: all .3s ease;
+            animation: textReveal .7s ease .95s both;
+        }
+
+        .signup-submit:hover {
+            background: var(--biz-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 9px 22px rgba(8,124,245,.24);
+        }
+
+        .signup-submit:disabled {
+            opacity: .85;
+            cursor: wait;
+            transform: none;
+        }
+
+        .login-spinner {
+            display: none;
+            width: 19px;
+            height: 19px;
+            border: 3px solid rgba(255,255,255,.35);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: loginSpin .7s linear infinite;
+        }
+
+        .signup-submit.loading .login-spinner {
+            display: inline-block;
+        }
+
+        @keyframes loginSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-text {
+            animation: textReveal .7s ease 1.05s both;
+        }
+
+        /* NOTIFICATIONS */
+
+        .auth-message {
+            position: relative;
+            padding: 14px 16px;
+            border-radius: 11px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: notificationReveal .55s ease both;
+        }
+
+        .auth-message.success {
+            background: #e8f8ef;
+            color: #147a42;
+            border: 1px solid #b8e7cb;
+        }
+
+        .auth-message.error {
+            background: #fff0f0;
+            color: #bd3030;
+            border: 1px solid #f1c1c1;
+        }
+
+        .auth-message.info {
+            background: #edf5ff;
+            color: #245a9b;
+            border: 1px solid #c7ddfa;
+        }
+
+        @keyframes notificationReveal {
+            from {
+                opacity: 0;
+                transform: translateY(-15px) scale(.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .signup-page {
+                min-height: 600px;
+                padding: 35px 15px;
+            }
+
+            .signup-container {
+                width: 100%;
+                padding: 27px 21px;
+                box-sizing: border-box;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .signup-container,
+            .signup-container *,
+            .signup-page::before,
+            .signup-page::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -70,9 +367,23 @@
                 and manage your businesses.
             </p>
 
+            <!-- SERVER NOTIFICATIONS -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="auth-message {{ category }}"
+                             role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
 
             <!-- LOGIN FORM -->
-            <form action="/login" method="POST">
+            <form action="/login"
+                  method="POST"
+                  id="loginForm">
 
                 <div class="form-group">
 
@@ -97,26 +408,31 @@
                         Password
                     </label>
 
-                   <div class="password-wrapper">
-    <input
-        type="password"
-        id="login-password"
-        name="password"
-        placeholder="Enter your password"
-        required
-    >
+                    <div class="password-wrapper">
 
-    <div class="forgot-password-link">
-    <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
-</div>
-    <button
-        type="button"
-        class="toggle-password"
-        onclick="togglePassword('login-password', this)"
-        aria-label="Show password"
-        title="Show password"
-    >👁</button>
-</div>
+                        <input
+                            type="password"
+                            id="login-password"
+                            name="password"
+                            placeholder="Enter your password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="toggle-password"
+                            onclick="togglePassword('login-password', this)"
+                            aria-label="Show password"
+                            title="Show password"
+                        >👁</button>
+
+                    </div>
+
+                    <div class="forgot-password-link">
+                        <a href="{{ url_for('forgot_password') }}">
+                            Forgot Password?
+                        </a>
+                    </div>
 
                 </div>
 
@@ -124,8 +440,15 @@
                 <button
                     type="submit"
                     class="signup-submit"
+                    id="loginButton"
                 >
-                    Login
+
+                    <span class="login-spinner"></span>
+
+                    <span id="loginButtonText">
+                        Login
+                    </span>
+
                 </button>
 
             </form>
@@ -166,23 +489,77 @@
 
     </footer>
 
-    <script>
-function togglePassword(inputId, button) {
-    const passwordInput = document.getElementById(inputId);
 
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        button.textContent = "🙈";
-        button.setAttribute("aria-label", "Hide password");
-        button.setAttribute("title", "Hide password");
-    } else {
-        passwordInput.type = "password";
-        button.textContent = "👁";
-        button.setAttribute("aria-label", "Show password");
-        button.setAttribute("title", "Show password");
-    }
-}
-</script>
+    <script>
+
+        // PASSWORD VISIBILITY
+
+        function togglePassword(inputId, button) {
+
+            const passwordInput =
+                document.getElementById(inputId);
+
+            if (passwordInput.type === "password") {
+
+                passwordInput.type = "text";
+                button.textContent = "🙈";
+
+                button.setAttribute(
+                    "aria-label",
+                    "Hide password"
+                );
+
+                button.setAttribute(
+                    "title",
+                    "Hide password"
+                );
+
+            } else {
+
+                passwordInput.type = "password";
+                button.textContent = "👁";
+
+                button.setAttribute(
+                    "aria-label",
+                    "Show password"
+                );
+
+                button.setAttribute(
+                    "title",
+                    "Show password"
+                );
+
+            }
+
+        }
+
+
+        // LOGIN LOADING ANIMATION
+
+        const loginForm =
+            document.getElementById("loginForm");
+
+        const loginButton =
+            document.getElementById("loginButton");
+
+        const loginButtonText =
+            document.getElementById("loginButtonText");
+
+        loginForm.addEventListener("submit", function() {
+
+            if (!loginForm.checkValidity()) {
+                return;
+            }
+
+            loginButton.disabled = true;
+            loginButton.classList.add("loading");
+
+            loginButtonText.textContent =
+                "Signing you in...";
+
+        });
+
+    </script>
 
 </body>
 
