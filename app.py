@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-from pymongo import MongoClient
+
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from bson.objectid import ObjectId
+from pymongo import MongoClient
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -492,9 +493,14 @@ def login():
 
             # Business owner login, including the super administrator
             session["role"] = "owner"
+
+# Trigger the dashboard entrance animation only after login
+            session["show_dashboard_intro"] = True
+
             return redirect(url_for("dashboard"))
 
-        return "Invalid email or password.", 401
+        flash("Invalid email or password. Please try again.", "error")
+        return redirect(url_for("login"))
 
     return render_template("login.html")
 
@@ -678,11 +684,15 @@ def dashboard():
         }).sort("created_at", -1)
     )
 
+    # Show the entrance animation only when redirected here after login
+    show_dashboard_intro = session.pop("show_dashboard_intro", False)
+
     return render_template(
         "dashboard.html",
         user_name=session["user_name"],
         businesses=businesses,
-        announcements=announcements
+        announcements=announcements,
+        show_dashboard_intro=show_dashboard_intro
     )
 
     # =========================
@@ -3830,6 +3840,7 @@ def record_order_payment(business_id, order_id):
 
     from decimal import Decimal, InvalidOperation
     from bson.objectid import ObjectId
+    from pymongo import MongoClient
     from pymongo.errors import PyMongoError
 
     try:
