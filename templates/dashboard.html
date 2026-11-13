@@ -107,6 +107,128 @@
     }
 }
 
+/* ==============================
+   FIRST-TIME USER GUIDE
+============================== */
+
+.onboarding-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(5, 20, 45, 0.82);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.onboarding-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 620px;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+    animation: dashboardFadeUp 0.5s ease both;
+}
+
+.onboarding-brand {
+    color: #087cf5;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.onboarding-card h2 {
+    color: #0b2145;
+    font-size: 27px;
+    margin-bottom: 12px;
+}
+
+.onboarding-card p {
+    color: #64748b;
+    line-height: 1.7;
+}
+
+.onboarding-icon {
+    font-size: 48px;
+    margin-bottom: 18px;
+}
+
+.onboarding-progress {
+    height: 7px;
+    background: #e8eef7;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 25px 0;
+}
+
+.onboarding-progress-bar {
+    height: 100%;
+    width: 20%;
+    background: #087cf5;
+    transition: width 0.3s ease;
+}
+
+.onboarding-step {
+    display: none;
+}
+
+.onboarding-step.active {
+    display: block;
+    animation: dashboardFadeUp 0.35s ease both;
+}
+
+.onboarding-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.onboarding-actions button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.onboarding-next {
+    background: #087cf5;
+    color: white;
+}
+
+.onboarding-back {
+    background: #edf2f8;
+    color: #0b2145;
+}
+
+.onboarding-skip {
+    background: transparent;
+    color: #64748b;
+}
+
+.onboarding-counter {
+    font-size: 13px;
+    color: #64748b;
+}
+
+@media(max-width: 600px) {
+    .onboarding-card {
+        padding: 25px 20px;
+    }
+
+    .onboarding-card h2 {
+        font-size: 23px;
+    }
+}
+
 /* Accessibility */
 
 @media (prefers-reduced-motion: reduce) {
@@ -116,6 +238,27 @@
         animation: none !important;
         transition: none !important;
     }
+}
+
+.onboarding-overlay[hidden] {
+    display: none !important;
+}
+
+.dashboard-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.getting-started-button {
+    background: #ffffff;
+    color: #087cf5;
+    border: 1px solid #087cf5;
+    padding: 11px 16px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
 </style>
@@ -195,9 +338,19 @@
                     </p>
                 </div>
 
-                <a href="/create-business" class="primary-button">
-                    + Create Business
-                </a>
+                <div class="dashboard-header-actions">
+
+    <button type="button"
+            class="getting-started-button"
+            onclick="openOnboardingGuide()">
+        <span>❔</span> Getting Started
+    </button>
+
+    <a href="/create-business" class="primary-button">
+        + Create Business
+    </a>
+
+</div>
 
             </div>
 
@@ -305,6 +458,121 @@
 
     </main>
 
+    <!-- =========================
+     BIZFLOW GETTING STARTED
+========================= -->
+
+<div class="onboarding-overlay"
+     id="onboardingGuide"
+     {% if not show_onboarding_guide %}hidden{% endif %}>
+
+    <div class="onboarding-card">
+
+        <div class="onboarding-brand">BIZFLOW GUIDE</div>
+
+        <div class="onboarding-progress">
+            <div class="onboarding-progress-bar"
+                 id="onboardingProgress"></div>
+        </div>
+
+        <div class="onboarding-step active">
+            <div class="onboarding-icon">👋</div>
+            <h2>Welcome to BIZFLOW!</h2>
+            <p>
+                Your business management journey starts here.
+                BIZFLOW helps you manage your businesses,
+                products, services, sales and finances in one place.
+            </p>
+        </div>
+
+        <div class="onboarding-step">
+            <div class="onboarding-icon">🏢</div>
+            <h2>Create Your Business</h2>
+            <p>
+                Start by clicking Create Business.
+                Enter your business name, business type
+                and description to create your workspace.
+            </p>
+        </div>
+
+        <div class="onboarding-step">
+            <div class="onboarding-icon">📦</div>
+            <h2>Add Products and Services</h2>
+            <p>
+                Add products you sell, set buying and selling prices,
+                and monitor stock. If you offer services,
+                create them so workers can book them.
+            </p>
+        </div>
+
+        <div class="onboarding-step">
+            <div class="onboarding-icon">🧾</div>
+            <h2>Manage Sales and Bookings</h2>
+            <p>
+                Record sales, issue receipts, manage customer payments,
+                track loans and repayments, and manage service bookings.
+            </p>
+        </div>
+
+        <div class="onboarding-step">
+            <div class="onboarding-icon">📊</div>
+            <h2>Track Your Business Performance</h2>
+            <p>
+                Use reports to understand your income,
+                expenses, profits and overall business performance.
+                You are now ready to use BIZFLOW!
+            </p>
+        </div>
+
+        <div class="onboarding-actions">
+
+            <button type="button"
+                    class="onboarding-skip"
+                    onclick="skipOnboardingGuide()">
+                Skip Guide
+            </button>
+
+            <span class="onboarding-counter"
+                  id="onboardingCounter">
+                Step 1 of 5
+            </span>
+
+            <div>
+                <button type="button"
+                        class="onboarding-back"
+                        id="onboardingBack"
+                        onclick="changeOnboardingStep(-1)"
+                        style="display:none;">
+                    Back
+                </button>
+
+                <button type="button"
+                        class="onboarding-next"
+                        id="onboardingNext"
+                        onclick="changeOnboardingStep(1)">
+                    Next
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<form id="onboardingCompleteForm"
+      method="POST"
+      action="{{ url_for('complete_onboarding') }}"
+      style="display:none;">
+    <input type="hidden" name="action" value="complete">
+</form>
+
+<form id="onboardingSkipForm"
+      method="POST"
+      action="{{ url_for('complete_onboarding') }}"
+      style="display:none;">
+    <input type="hidden" name="action" value="skip">
+</form>
+
 
     <!-- FOOTER -->
     <footer>
@@ -324,6 +592,65 @@
         </p>
 
     </footer>
+
+    <script>
+
+let currentOnboardingStep = 0;
+
+const onboardingSteps = document.querySelectorAll(".onboarding-step");
+
+function openOnboardingGuide() {
+    currentOnboardingStep = 0;
+
+    document.getElementById("onboardingGuide").hidden = false;
+
+    updateOnboardingGuide();
+}
+
+function updateOnboardingGuide() {
+
+    onboardingSteps.forEach((step, index) => {
+        step.classList.toggle(
+            "active",
+            index === currentOnboardingStep
+        );
+    });
+
+    document.getElementById("onboardingProgress").style.width =
+        ((currentOnboardingStep + 1) / onboardingSteps.length * 100) + "%";
+
+    document.getElementById("onboardingCounter").textContent =
+        "Step " + (currentOnboardingStep + 1) +
+        " of " + onboardingSteps.length;
+
+    document.getElementById("onboardingBack").style.display =
+        currentOnboardingStep === 0 ? "none" : "inline-block";
+
+    document.getElementById("onboardingNext").textContent =
+        currentOnboardingStep === onboardingSteps.length - 1
+        ? "Finish"
+        : "Next";
+}
+
+function changeOnboardingStep(direction) {
+
+    if (currentOnboardingStep === onboardingSteps.length - 1
+        && direction === 1) {
+
+        document.getElementById("onboardingCompleteForm").submit();
+        return;
+    }
+
+    currentOnboardingStep += direction;
+
+    updateOnboardingGuide();
+}
+
+function skipOnboardingGuide() {
+    document.getElementById("onboardingSkipForm").submit();
+}
+
+</script>
 
 </body>
 

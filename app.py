@@ -392,6 +392,11 @@ def signup():
             "email": email,
             "password_hash": password_hash,
             "account_status": "pending",
+
+            # First-time onboarding guide
+            "onboarding_completed": False,
+            "onboarding_skipped": False,
+
             "created_at": datetime.now(timezone.utc)
         }
 
@@ -494,7 +499,14 @@ def login():
             # Business owner login, including the super administrator
             session["role"] = "owner"
 
-# Trigger the dashboard entrance animation only after login
+            # Check whether this is a first-time user
+            session["show_onboarding_guide"] = (
+                "onboarding_completed" in user
+                and not user.get("onboarding_completed", False)
+                and not user.get("onboarding_skipped", False)
+            )
+
+     # Trigger the dashboard entrance animation only after login
             session["show_dashboard_intro"] = True
 
             return redirect(url_for("dashboard"))
@@ -687,13 +699,50 @@ def dashboard():
     # Show the entrance animation only when redirected here after login
     show_dashboard_intro = session.pop("show_dashboard_intro", False)
 
+    # Show the onboarding guide only for eligible first-time users
+    show_onboarding_guide = session.pop("show_onboarding_guide", False)
+
     return render_template(
         "dashboard.html",
         user_name=session["user_name"],
         businesses=businesses,
         announcements=announcements,
-        show_dashboard_intro=show_dashboard_intro
+        show_dashboard_intro=show_dashboard_intro,
+        show_onboarding_guide=show_onboarding_guide
     )
+
+# =========================
+# COMPLETE ONBOARDING
+# =========================
+
+
+@app.route("/complete-onboarding", methods=["POST"])
+def complete_onboarding():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    action = request.form.get("action")
+
+    if action == "complete":
+        users_collection.update_one(
+            {"_id": ObjectId(session["user_id"])},
+            {"$set": {
+                "onboarding_completed": True,
+                "onboarding_skipped": False
+            }}
+        )
+
+    elif action == "skip":
+        users_collection.update_one(
+            {"_id": ObjectId(session["user_id"])},
+            {"$set": {
+                "onboarding_completed": False,
+                "onboarding_skipped": True
+            }}
+        )
+
+    return redirect(url_for("dashboard"))
 
     # =========================
 # SUPER ADMIN: RESET USER ACCOUNT DATA
