@@ -8944,6 +8944,136 @@ body:has(.reports-page) {
 }
 
 
+/* ==============================
+   BIZFLOW WORKSPACE MOBILE GRID
+============================== */
+
+@media screen and (max-width: 700px) {
+
+    .workspace-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .workspace-card {
+        min-width: 0;
+        padding: 18px 14px;
+    }
+
+    .workspace-card h3 {
+        font-size: 17px;
+    }
+
+    .workspace-card p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .workspace-card a {
+        font-size: 13px;
+    }
+
+}
+
+/* Dashboard Profile Icon */
+.profile-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.profile-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2ff;
+    color: #4338ca;
+    border: 1px solid #dbe3ff;
+    transition: all 0.25s ease;
+}
+
+.profile-circle:hover {
+    background: #4338ca;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.2);
+}
+
+.delete-business-btn {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.delete-business-btn:hover {
+    background: #b91c1c;
+}
+
+        .settings-workers {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .settings-workers h4 {
+            margin-bottom: 12px;
+        }
+
+        .settings-worker {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-worker p {
+            margin-top: 5px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .remove-worker-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 9px 13px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .remove-worker-btn:hover {
+            background: #d97706;
+        }
+
+        .delete-business-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .delete-business-btn:hover {
+            background: #b91c1c;
+        }
+
+
+
 
 
 

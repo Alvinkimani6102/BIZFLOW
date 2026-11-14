@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .profile-container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 25px;
+        }
+
+        .profile-header {
+            margin-bottom: 25px;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+            margin-bottom: 25px;
+        }
+
+        .profile-card h2 {
+            margin-bottom: 20px;
+        }
+
+        .profile-form-group {
+            margin-bottom: 18px;
+        }
+
+        .profile-form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .profile-form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            box-sizing: border-box;
+        }
+
+        .profile-form-group input[readonly] {
+            background: #f1f3f5;
+            cursor: not-allowed;
+        }
+
+        .profile-save-btn {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .profile-save-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .profile-role {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #e8f0ff;
+            color: #2455a4;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .profile-message {
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+        }
+
+        .profile-message.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .profile-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 600px) {
+            .profile-container {
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            .profile-card {
+                padding: 18px;
+            }
+        }
+
+        .profile-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-settings-link {
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.profile-settings-circle {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: #4338ca;
+    border: 1px solid #dbe3ff;
+    transition: all 0.25s ease;
+}
+
+.profile-settings-circle:hover {
+    background: #4338ca;
+    color: white;
+    transform: rotate(45deg);
+}
+
+@media (max-width: 600px) {
+    .profile-header-top {
+        align-items: flex-start;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+<div class="profile-container">
+
+    <div class="profile-header">
+    <div class="profile-header-top">
+        <div>
+            <h1>My Profile</h1>
+            <p>Manage your personal account information.</p>
+            <span class="profile-role">{{ role }}</span>
+        </div>
+
+        {% if role == 'Owner' %}
+        <a href="{{ url_for('owner_settings') }}"
+           class="profile-settings-link"
+           title="Settings"
+           aria-label="Settings">
+
+            <span class="profile-settings-circle">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="22" height="22"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 1.7-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1 1.55V20h-2.4v-.21a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.88.34l-.06.06-1.7-1.7.06-.06A1.7 1.7 0 0 0 8.5 15a1.7 1.7 0 0 0-1.55-1H6v-2.4h.95a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.88L8.1 8.66l1.7-1.7.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1-1.55V5.6h2.4v.21a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.7 1.7-.06.06A1.7 1.7 0 0 0 19.4 10.6a1.7 1.7 0 0 0 1.55 1H22v2.4h-.95a1.7 1.7 0 0 0-1.65 1z"></path>
+                </svg>
+            </span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="profile-message {{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+
+        <input type="hidden" name="form_type" value="profile">
+
+        <div class="profile-card">
+            <h2>Personal Information</h2>
+
+            <div class="profile-form-group">
+                <label>Full Name</label>
+                <input type="text"
+                       name="name"
+                       value="{{ user.name }}"
+                       maxlength="100"
+                       required>
+            </div>
+
+            <div class="profile-form-group">
+                <label>Email Address</label>
+                <input type="email"
+                       value="{{ user.email }}"
+                       readonly>
+            </div>
+
+            <div class="profile-form-group">
+                <label>Phone Number (Optional)</label>
+                <input type="tel"
+                       name="phone"
+                       value="{{ user.get('phone', '') }}"
+                       maxlength="30"
+                       placeholder="Enter your phone number">
+            </div>
+
+            <button type="submit" class="profile-save-btn">
+                Save Profile
+            </button>
+        </div>
+
+    </form>
+
+    <form method="POST">
+        <input type="hidden" name="form_type" value="password">
+
+        <div class="profile-card">
+            <h2>Change Password</h2>
+
+            <div class="profile-form-group">
+                <label>Current Password</label>
+                <input type="password"
+                       name="current_password"
+                       autocomplete="current-password">
+            </div>
+
+            <div class="profile-form-group">
+                <label>New Password</label>
+                <input type="password"
+                       name="new_password"
+                       minlength="8"
+                       autocomplete="new-password">
+            </div>
+
+            <div class="profile-form-group">
+                <label>Confirm New Password</label>
+                <input type="password"
+                       name="confirm_password"
+                       minlength="8"
+                       autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="profile-save-btn">
+                Update Password
+            </button>
+        </div>
+
+    </form>
+
+    <a href="{{ url_for('dashboard') if role == 'Owner' else url_for('business_workspace', business_id=session.get('business_id')) }}">
+        ← Back to Workspace
+    </a>
+
+</div>
+
+</body>
+</html>

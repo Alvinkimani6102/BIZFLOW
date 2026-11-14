@@ -277,10 +277,30 @@
             >
         </a>
 
-        <nav>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/logout" class="signup-button">Logout</a>
-        </nav>
+        
+<nav>
+    <a href="/dashboard">Dashboard</a>
+
+    <a href="{{ url_for('profile') }}" class="profile-icon-link"
+       title="My Profile" aria-label="My Profile">
+        <span class="profile-circle">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="22" height="22"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="1.8"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M5 21a7 7 0 0 1 14 0"></path>
+            </svg>
+        </span>
+    </a>
+
+    <a href="/logout" class="signup-button">Logout</a>
+</nav>
+
 
     </header>
 

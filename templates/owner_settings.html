@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Owner Settings | BIZFLOW</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .settings-container {
+            max-width: 950px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .settings-header {
+            margin-bottom: 25px;
+        }
+
+        .settings-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+            margin-bottom: 22px;
+        }
+
+        .settings-business {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-business:last-child {
+            border-bottom: none;
+        }
+
+        .settings-business h3 {
+            margin: 0 0 5px;
+        }
+
+        .settings-business p {
+            margin: 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .settings-back {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .settings-container {
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            .settings-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="settings-container">
+
+    <div class="settings-header">
+        <h1>Owner Settings</h1>
+        <p>Manage your businesses and workers.</p>
+    </div>
+
+    <div class="settings-card">
+        <h2>Manage Businesses</h2>
+        <p>Businesses created under your account.</p>
+
+        {% if businesses %}
+            {% for business in businesses %}
+                <div class="settings-business">
+                    <div>
+                        <h3>
+                            {{ business.get('name', business.get('business_name', 'Unnamed Business')) }}
+                        </h3>
+
+                        <p>
+                            {{ business.get('business_type', 'Business') }}
+                        </p>
+
+                        <form method="POST"
+      action="{{ url_for('delete_owner_business', business_id=business['_id']) }}"
+      onsubmit="return confirm('WARNING: This will permanently delete this business and all its associated records. Are you sure you want to continue?');">
+
+    <button type="submit" class="delete-business-btn">
+        Delete Business
+    </button>
+
+</form>
+
+                        <!-- Assigned Workers -->
+                        <div class="settings-workers">
+
+                            <h4>Assigned Workers</h4>
+
+                            {% if business.workers %}
+
+                                {% for worker in business.workers %}
+
+                                    <div class="settings-worker">
+
+                                        <div>
+                                            <strong>{{ worker.name }}</strong>
+                                            <p>{{ worker.email }}</p>
+                                        </div>
+
+                                        <form method="POST"
+                                              action="{{ url_for('remove_business_worker', business_id=business['_id'], membership_id=worker.membership_id) }}"
+                                              onsubmit="return confirm('Remove this worker from this business? Their account will not be deleted.');">
+
+                                            <button type="submit" class="remove-worker-btn">
+                                                Remove Worker
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <p>No workers assigned to this business.</p>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>You have not created any businesses yet.</p>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('profile') }}" class="settings-back">
+        ← Back to My Profile
+    </a>
+
+</div>
+
+</body>
+</html>

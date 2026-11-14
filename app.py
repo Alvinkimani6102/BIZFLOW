@@ -518,6 +518,286 @@ def login():
 
 
 # =========================
+# USER PROFILE
+# =========================
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if not ObjectId.is_valid(session["user_id"]):
+        session.clear()
+        return redirect(url_for("login"))
+
+    user = users_collection.find_one({
+        "_id": ObjectId(session["user_id"])
+    })
+
+    if not user:
+        session.clear()
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+
+        form_type = request.form.get("form_type")
+
+        # UPDATE PERSONAL INFORMATION
+        if form_type == "profile":
+
+            name = request.form.get("name", "").strip()
+            phone = request.form.get("phone", "").strip()
+
+            if not name:
+                flash("Full name is required.", "error")
+                return redirect(url_for("profile"))
+
+            if len(name) > 100 or len(phone) > 30:
+                flash("Please check your name or phone number length.", "error")
+                return redirect(url_for("profile"))
+
+            users_collection.update_one(
+                {"_id": ObjectId(session["user_id"])},
+                {"$set": {
+                    "name": name,
+                    "phone": phone
+                }}
+            )
+
+            session["user_name"] = name
+
+            flash("Your profile has been updated successfully.", "success")
+            return redirect(url_for("profile"))
+
+        # CHANGE PASSWORD
+        elif form_type == "password":
+
+            current_password = request.form.get("current_password", "")
+            new_password = request.form.get("new_password", "")
+            confirm_password = request.form.get("confirm_password", "")
+
+            if not current_password:
+                flash("Enter your current password.", "error")
+                return redirect(url_for("profile"))
+
+            if not check_password_hash(
+                user.get("password_hash", ""),
+                current_password
+            ):
+                flash("Your current password is incorrect.", "error")
+                return redirect(url_for("profile"))
+
+            if len(new_password) < 8:
+                flash("Your new password must be at least 8 characters.", "error")
+                return redirect(url_for("profile"))
+
+            if new_password != confirm_password:
+                flash("Your new passwords do not match.", "error")
+                return redirect(url_for("profile"))
+
+            users_collection.update_one(
+                {"_id": ObjectId(session["user_id"])},
+                {"$set": {
+                    "password_hash": generate_password_hash(new_password)
+                }}
+            )
+
+            flash("Your password has been changed successfully.", "success")
+            return redirect(url_for("profile"))
+
+    return render_template(
+        "profile.html",
+        user=user,
+        role=session.get("role", "owner").title()
+    )
+
+    # =========================
+# OWNER SETTINGS
+# =========================
+
+
+@app.route("/owner-settings")
+def owner_settings():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("role") != "owner":
+        flash("You are not authorized to access owner settings.", "error")
+        return redirect(url_for("profile"))
+
+    businesses = list(businesses_collection.find({
+        "owner_id": session["user_id"]
+    }))
+
+    # Attach each business's active workers.
+    for business in businesses:
+
+        business_id_string = str(business["_id"])
+
+        memberships = business_memberships.find({
+            "business_id": business_id_string,
+            "owner_id": session["user_id"],
+            "status": "active"
+        })
+
+        business_workers = []
+
+        for membership in memberships:
+
+            if not ObjectId.is_valid(membership.get("user_id", "")):
+                continue
+
+            worker = users_collection.find_one({
+                "_id": ObjectId(membership["user_id"]),
+                "role": "worker"
+            })
+
+            if worker:
+                business_workers.append({
+                    "name": worker.get("name", "Unnamed Worker"),
+                    "email": worker.get("email", ""),
+                    "membership_id": str(membership["_id"])
+                })
+
+        business["workers"] = business_workers
+
+    return render_template(
+        "owner_settings.html",
+        businesses=businesses
+    )
+
+    # =========================
+# DELETE OWNER BUSINESS
+# =========================
+
+
+@app.route(
+    "/owner-settings/delete-business/<business_id>",
+    methods=["POST"]
+)
+def delete_owner_business(business_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("role") != "owner":
+        return "Access denied.", 403
+
+    if not ObjectId.is_valid(business_id):
+        return "Invalid business ID.", 400
+
+    # Verify this business belongs to the logged-in owner.
+    business = businesses_collection.find_one({
+        "_id": ObjectId(business_id),
+        "owner_id": session["user_id"]
+    })
+
+    if not business:
+        return "Business not found or access denied.", 404
+
+    business_id_string = str(business["_id"])
+    owner_id = session["user_id"]
+
+    record_collections = [
+        "products",
+        "services",
+        "bookings",
+        "sales",
+        "expenses",
+        "categories",
+        "stock_movements",
+        "orders",
+        "sales_drafts"
+    ]
+
+    try:
+        with client.start_session() as mongo_session:
+            with mongo_session.start_transaction():
+
+                # Delete only records belonging to this business.
+                for collection_name in record_collections:
+                    db[collection_name].delete_many(
+                        {
+                            "business_id": business_id_string,
+                            "owner_id": owner_id
+                        },
+                        session=mongo_session
+                    )
+
+                # Remove this business's worker assignments only.
+                business_memberships.delete_many(
+                    {
+                        "business_id": business_id_string,
+                        "owner_id": owner_id
+                    },
+                    session=mongo_session
+                )
+
+                # Delete the business itself.
+                businesses_collection.delete_one(
+                    {
+                        "_id": ObjectId(business_id),
+                        "owner_id": owner_id
+                    },
+                    session=mongo_session
+                )
+
+    except PyMongoError:
+        app.logger.exception("Business deletion failed.")
+        return "Business could not be deleted. Please try again.", 500
+
+    flash("Business and its associated records deleted successfully.", "success")
+
+    return redirect(url_for("owner_settings"))
+
+
+@app.route(
+    "/owner-settings/remove-worker/<business_id>/<membership_id>",
+    methods=["POST"]
+)
+def remove_business_worker(business_id, membership_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("role") != "owner":
+        return "Access denied.", 403
+
+    if not ObjectId.is_valid(business_id) or not ObjectId.is_valid(membership_id):
+        return "Invalid business or worker assignment.", 400
+
+    # Confirm that this business belongs to the logged-in owner.
+    business = businesses_collection.find_one({
+        "_id": ObjectId(business_id),
+        "owner_id": session["user_id"]
+    })
+
+    if not business:
+        return "Business not found or access denied.", 404
+
+    # Remove only this worker's assignment to this business.
+    result = business_memberships.delete_one({
+        "_id": ObjectId(membership_id),
+        "business_id": str(business["_id"]),
+        "owner_id": session["user_id"],
+        "role": "worker",
+        "status": "active"
+    })
+
+    if result.deleted_count == 0:
+        return "Worker assignment not found.", 404
+
+    flash(
+        "Worker removed from this business. Their account has not been deleted.",
+        "success"
+    )
+
+    return redirect(url_for("owner_settings"))
+
+
+# =========================
 # ACCOUNT RECOVERY
 # =========================
 
